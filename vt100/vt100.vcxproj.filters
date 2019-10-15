@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="view">
+      <UniqueIdentifier>{f05e761e-15f2-4a58-93d4-3cdf911bea8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="control">
+      <UniqueIdentifier>{99826022-b76e-4722-8909-f68b875e0baf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="parser">
+      <UniqueIdentifier>{512c8f8b-d170-49c1-a1c4-ae3cb28e2e3f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\VtParser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\VtFormat.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\VtFmtAction.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\VtBufChain.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\VtContext.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\VtFmtManager.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtControl.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlCharset.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlClear.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlColor.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlCursor.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlDeviceStatus.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlPrint.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlScrolling.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlSetup.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlTab.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="control\VtCtrlUnknown.h">
+      <Filter>control</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\VtParser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\VtFormat.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\VtFmtAction.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\VtBufChain.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\VtFmtManager.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtControl.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlCharset.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlClear.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlColor.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlCursor.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlDeviceStatus.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlPrint.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlScrolling.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlSetup.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlTab.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="control\VtCtrlUnknown.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
