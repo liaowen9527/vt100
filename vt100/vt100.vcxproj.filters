@@ -13,70 +13,148 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="view">
-      <UniqueIdentifier>{f05e761e-15f2-4a58-93d4-3cdf911bea8e}</UniqueIdentifier>
+    <Filter Include="vt100">
+      <UniqueIdentifier>{217c09c2-6d23-4bf5-a203-bcf607243160}</UniqueIdentifier>
     </Filter>
-    <Filter Include="control">
-      <UniqueIdentifier>{99826022-b76e-4722-8909-f68b875e0baf}</UniqueIdentifier>
+    <Filter Include="vt100\control">
+      <UniqueIdentifier>{9c667501-e291-4947-b0e2-a3e9434e06ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="parser">
-      <UniqueIdentifier>{512c8f8b-d170-49c1-a1c4-ae3cb28e2e3f}</UniqueIdentifier>
+    <Filter Include="vt100\parser">
+      <UniqueIdentifier>{4f42b660-a8ac-4aa8-894a-38a5c54fb48b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vt100\define">
+      <UniqueIdentifier>{31a9111c-946e-4030-969c-19e78fcc00f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vt100\help">
+      <UniqueIdentifier>{aea54c9d-0605-4d76-ac99-4c6af0f3b41b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vt100\data">
+      <UniqueIdentifier>{ce6a4889-ee74-4a04-997d-88b3e7ab48f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser\VtParser.h">
-      <Filter>parser</Filter>
+    <ClInclude Include="vt100\control\VtCtrlCharset.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="parser\VtFormat.h">
-      <Filter>parser</Filter>
+    <ClInclude Include="vt100\control\VtCtrlClear.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="parser\VtFmtAction.h">
-      <Filter>parser</Filter>
+    <ClInclude Include="vt100\control\VtCtrlColor.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="parser\VtBufChain.h">
-      <Filter>parser</Filter>
+    <ClInclude Include="vt100\control\VtCtrlCursor.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="parser\VtContext.h">
-      <Filter>parser</Filter>
+    <ClInclude Include="vt100\control\VtCtrlDeviceStatus.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="parser\VtFmtManager.h">
-      <Filter>parser</Filter>
+    <ClInclude Include="vt100\control\VtCtrlPrint.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtControl.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\control\VtCtrlScrolling.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlCharset.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\control\VtCtrlSetup.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlClear.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\control\VtCtrlTab.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlColor.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\control\VtCtrlUnknown.h">
+      <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlCursor.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\define\Termstate.h">
+      <Filter>vt100\define</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlDeviceStatus.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\define\VtType.h">
+      <Filter>vt100\define</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlPrint.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\parser\VtParserESC.h">
+      <Filter>vt100\parser</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlScrolling.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\parser\VtParserCSI.h">
+      <Filter>vt100\parser</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlSetup.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\parser\VtParserOSC.h">
+      <Filter>vt100\parser</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlTab.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\parser\VtParserOSC_String.h">
+      <Filter>vt100\parser</Filter>
     </ClInclude>
-    <ClInclude Include="control\VtCtrlUnknown.h">
-      <Filter>control</Filter>
+    <ClInclude Include="vt100\parser\VtParserOSC_P.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserOSC_W.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserVT52Esc.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserVT52_BG.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserVT52_FG.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserVT52_Y1.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserBase.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParser.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserOSC_MaybeST.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserVT52_Y2.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtParserTopLevel.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\help\WCharWidth.h">
+      <Filter>vt100\help</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtCursor.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtData.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\terminal_tag.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\define\VtDefine.h">
+      <Filter>vt100\define</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\parser\VtCharTrans.h">
+      <Filter>vt100\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\help\UnicodeData.h">
+      <Filter>vt100\help</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\help\Codepage.h">
+      <Filter>vt100\help</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtTermChar.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtTermLine.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtTermBuffer.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtTerm.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\help\Postion.h">
+      <Filter>vt100\help</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,53 +164,113 @@
     <ClCompile Include="vt100.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parser\VtParser.cpp">
-      <Filter>parser</Filter>
+    <ClCompile Include="vt100\control\VtCtrlCharset.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="parser\VtFormat.cpp">
-      <Filter>parser</Filter>
+    <ClCompile Include="vt100\control\VtCtrlClear.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="parser\VtFmtAction.cpp">
-      <Filter>parser</Filter>
+    <ClCompile Include="vt100\control\VtCtrlColor.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="parser\VtBufChain.cpp">
-      <Filter>parser</Filter>
+    <ClCompile Include="vt100\control\VtCtrlCursor.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="parser\VtFmtManager.cpp">
-      <Filter>parser</Filter>
+    <ClCompile Include="vt100\control\VtCtrlDeviceStatus.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtControl.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\control\VtCtrlPrint.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlCharset.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\control\VtCtrlScrolling.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlClear.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\control\VtCtrlSetup.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlColor.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\control\VtCtrlTab.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlCursor.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\control\VtCtrlUnknown.cpp">
+      <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlDeviceStatus.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\parser\VtParserESC.cpp">
+      <Filter>vt100\parser</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlPrint.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\parser\VtParserCSI.cpp">
+      <Filter>vt100\parser</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlScrolling.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\parser\VtParserOSC.cpp">
+      <Filter>vt100\parser</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlSetup.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\parser\VtParserOSC_String.cpp">
+      <Filter>vt100\parser</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlTab.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\parser\VtParserOSC_P.cpp">
+      <Filter>vt100\parser</Filter>
     </ClCompile>
-    <ClCompile Include="control\VtCtrlUnknown.cpp">
-      <Filter>control</Filter>
+    <ClCompile Include="vt100\parser\VtParserOSC_W.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserVT52Esc.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserVT52_BG.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserVT52_FG.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserVT52_Y1.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserBase.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParser.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserOSC_MaybeST.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserVT52_Y2.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtParserTopLevel.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\help\WCharWidth.cpp">
+      <Filter>vt100\help</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtCursor.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtData.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\parser\VtCharTrans.cpp">
+      <Filter>vt100\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\help\UnicodeData.cpp">
+      <Filter>vt100\help</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\help\Codepage.cpp">
+      <Filter>vt100\help</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtTermChar.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtTermLine.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtTermBuffer.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtTerm.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\help\Postion.cpp">
+      <Filter>vt100\help</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
