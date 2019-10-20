@@ -164,7 +164,6 @@
     <ClInclude Include="vt100\control\VtCtrlSetup.h" />
     <ClInclude Include="vt100\control\VtCtrlTab.h" />
     <ClInclude Include="vt100\control\VtCtrlUnknown.h" />
-    <ClInclude Include="vt100\data\terminal_tag.h" />
     <ClInclude Include="vt100\data\VtCursor.h" />
     <ClInclude Include="vt100\data\VtData.h" />
     <ClInclude Include="vt100\data\VtTermChar.h" />

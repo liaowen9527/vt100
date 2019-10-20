@@ -1,5 +1,19 @@
 #pragma once
 
+/*
+* UCSINCOMPLETE is returned from term_translate if it's successfully
+* absorbed a byte but not emitted a complete character yet.
+* UCSTRUNCATED indicates a truncated multibyte sequence (so the
+* caller emits an error character and then calls term_translate again
+* with the same input byte). UCSINVALID indicates some other invalid
+* multibyte sequence, such as an overlong synonym, or a standalone
+* continuation byte, or a completely illegal thing like 0xFE. These
+* values are not stored in the terminal data structures at all.
+*/
+#define UCSINCOMPLETE 0x8000003FU    /* '?' */
+#define UCSTRUNCATED  0x80000021U    /* '!' */
+#define UCSINVALID    0x8000002AU    /* '*' */
+
 class VtCharTrans
 {
 public:
@@ -8,20 +22,15 @@ public:
 
 public:
 	void SetTerm(terminal_tag* p);
-	bool Translate(char c);
-	bool IsBreak();
+	unsigned long Translate(unsigned char c);
 
 protected:
-	void Break();
-	void SetResult(unsigned long result);
+	unsigned long ByUtf(unsigned char c);
+	unsigned long ByUtf_0(unsigned char c);
+	unsigned long ByUtf_1(unsigned char c);
 
-protected:
-	void ByUtf();
-	void ByUtf_0();
-	void ByUtf_1();
-
-	void ByAcs();
-	void ByCharset();
+	unsigned long ByAcs(unsigned char c);
+	unsigned long ByCharset(unsigned char c);
 
 protected:
 	bool IsAcsMode();
@@ -30,9 +39,5 @@ protected:
 
 protected:
 	terminal_tag* term;
-
-	unsigned long m_orgin;
-	unsigned long m_result;
-	bool m_break;
 };
 

@@ -15,6 +15,15 @@ public:
 	int col;
 };
 
+class Rect
+{
+public:
+	Rect(const Postion& _start, const Postion& _end);
+
+public:
+	Postion start;
+	Postion end;
+};
 
 class Size
 {
@@ -28,4 +37,26 @@ public:
 public:
 	int rows;
 	int cols;
+};
+
+class Margin
+{
+public:
+	Margin(int _top = 0, int _bottom = 0);
+
+public:
+	int Lines();
+
+	bool AtUp(int row);
+	bool AtBottom(int row);
+
+	bool IsVisibleRow(int row);
+
+public:
+	void PosUp(Postion& pos);
+	void PosDown(Postion& pos);
+
+public:
+	int top;
+	int bottom;
 };

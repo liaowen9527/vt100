@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 
-struct terminal_tag;
+struct VtTerm;
 
 class VtData
 {
@@ -9,10 +9,10 @@ public:
 	VtData();
 	virtual ~VtData();
 
-	void SetTerm(terminal_tag* p);
+	void SetTerm(VtTerm* p);
 
 protected:
-	terminal_tag* term;
+	VtTerm * term;
 	VtTerm* m_vtTerm;
 };
 

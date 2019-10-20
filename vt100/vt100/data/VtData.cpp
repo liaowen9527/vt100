@@ -10,7 +10,7 @@ VtData::~VtData()
 
 }
 
-void VtData::SetTerm(terminal_tag* p)
+void VtData::SetTerm(VtTerm* p)
 {
 	term = p;
 }

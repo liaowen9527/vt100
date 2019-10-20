@@ -89,6 +89,9 @@ void VtParserCSI::Control()
 	case 'B':		/* CUD: Cursor down */
 		CursorDown();
 		break;
+	case 'b':        /* REP: repeat previous grap */
+		RepeateGrap();
+		break;
 	case ANSI('c', '>'):	/* DA: report xterm version */
 		ReportXtermVersion();
 		break;
@@ -224,7 +227,10 @@ void VtParserCSI::Control()
 
 void VtParserCSI::MoveUp()
 {
-
+	CLAMP(term->esc_args[0], term->rows);
+	move(term, term->curs.x,
+		term->curs.y - def(term->esc_args[0], 1), 1);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::ModeDown()
@@ -243,113 +249,304 @@ void VtParserCSI::MoveRight()
 
 void VtParserCSI::MoveLeft()
 {
-
+	CLAMP(term->esc_args[0], term->cols);
+	move(term, term->curs.x - def(term->esc_args[0], 1),
+		term->curs.y, 1);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::CursorDown()
 {
-
+	CLAMP(term->esc_args[0], term->rows);
+	move(term, term->curs.x,
+		term->curs.y + def(term->esc_args[0], 1), 1);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::CursorRight()
 {
-
+	CLAMP(term->esc_args[0], term->cols);
+	move(term, term->curs.x + def(term->esc_args[0], 1),
+		term->curs.y, 1);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::DownAndCR()
 {
 	if (!CheckCompat(ANSI)) return;
 
+	CLAMP(term->esc_args[0], term->rows);
+	move(term, 0,
+		term->curs.y + def(term->esc_args[0], 1), 1);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::UpAndCR()
 {
 	if (!CheckCompat(ANSI)) return;
+
+	CLAMP(term->esc_args[0], term->rows);
+	move(term, 0,
+		term->curs.y - def(term->esc_args[0], 1), 1);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::Horizontal()
 {
 	if (!CheckCompat(ANSI)) return;
+
+	CLAMP(term->esc_args[0], term->cols);
+	move(term, def(term->esc_args[0], 1) - 1,
+		term->curs.y, 0);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::Vertical()
 {
 	if (!CheckCompat(ANSI)) return;
+
+	CLAMP(term->esc_args[0], term->rows);
+	move(term, term->curs.x,
+		((term->dec_om ? term->marg_t : 0) +
+			def(term->esc_args[0], 1) - 1),
+			(term->dec_om ? 2 : 0));
+	seen_disp_event(term);
 }
 
 void VtParserCSI::Postion()
 {
+	if (term->esc_nargs < 2)
+		term->esc_args[1] = ARG_DEFAULT;
+	CLAMP(term->esc_args[0], term->rows);
+	CLAMP(term->esc_args[1], term->cols);
+	move(term, def(term->esc_args[1], 1) - 1,
+		((term->dec_om ? term->marg_t : 0) +
+			def(term->esc_args[0], 1) - 1),
+			(term->dec_om ? 2 : 0));
+	seen_disp_event(term);
+}
 
+void VtParserCSI::RepeateGrap()
+{
+	CLAMP(term->esc_args[0], term->rows * term->cols);
+	if (term->last_graphic_char) {
+		unsigned i;
+		for (i = 0; i < term->esc_args[0]; i++)
+			term_display_graphic_char(
+				term, term->last_graphic_char);
+	}
 }
 
 void VtParserCSI::ReportXtermVersion()
 {
 	if (!CheckCompat(OTHER)) return;
+
+	/* this reports xterm version 136 so that VIM can
+	use the drag messages from the mouse reporting */
+	if (term->ldisc)
+	{
+		ldisc_send(term->ldisc, "\033[>0;136;0c", 11,
+			false);
+	}
 }
 
 void VtParserCSI::EraseParts()
 {
+	unsigned int i = def(term->esc_args[0], 0);
+	if (i == 3) {
+		/* Erase Saved Lines (xterm)
+		* This follows Thomas Dickey's xterm. */
+		if (!term->no_remote_clearscroll)
+			term_clrsb(term);
+	}
+	else {
+		i++;
+		if (i > 3)
+			i = 0;
+		erase_lots(term, false, !!(i & 2), !!(i & 1));
+	}
 
+	if (term->scroll_on_disp)
+		term->disptop = 0;
+	seen_disp_event(term);
 }
 
 void VtParserCSI::EraseLineOrParts()
 {
-
+	{
+		unsigned int i = def(term->esc_args[0], 0) + 1;
+		if (i > 3)
+			i = 0;
+		erase_lots(term, true, !!(i & 2), !!(i & 1));
+	}
+	seen_disp_event(term);
 }
 
 void VtParserCSI::InsertLines()
 {
 	if (!CheckCompat(VT102)) return;
+
+	CLAMP(term->esc_args[0], term->rows);
+	if (term->curs.y <= term->marg_b)
+		scroll(term, term->curs.y, term->marg_b,
+			-def(term->esc_args[0], 1), false);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::DeleteLines()
 {
 	if (!CheckCompat(VT102)) return;
+
+	CLAMP(term->esc_args[0], term->rows);
+	if (term->curs.y <= term->marg_b)
+		scroll(term, term->curs.y, term->marg_b,
+			def(term->esc_args[0], 1),
+			true);
+	seen_disp_event(term);
 }
 
 void VtParserCSI::InsertChars()
 {
 	if (!CheckCompat(VT102)) return;
+
+	CLAMP(term->esc_args[0], term->cols);
+	insch(term, def(term->esc_args[0], 1));
+	seen_disp_event(term);
 }
 
 void VtParserCSI::DeleteChars()
 {
 	if (!CheckCompat(VT102)) return;
+
+	CLAMP(term->esc_args[0], term->cols);
+	insch(term, -def(term->esc_args[0], 1));
+	seen_disp_event(term);
 }
 
 void VtParserCSI::TypeQuery()
 {
 	if (!CheckCompat(VT100)) return;
+
+	/* This is the response for a VT102 */
+	if (term->ldisc && term->id_string[0])
+		ldisc_send(term->ldisc, term->id_string,
+			strlen(term->id_string), false);
 }
 
 void VtParserCSI::CursorPosQuery()
 {
-
+	if (term->ldisc) {
+		if (term->esc_args[0] == 6) {
+			char buf[32];
+			sprintf(buf, "\033[%d;%dR", term->curs.y + 1,
+				term->curs.x + 1);
+			ldisc_send(term->ldisc, buf, strlen(buf),
+				false);
+		}
+		else if (term->esc_args[0] == 5) {
+			ldisc_send(term->ldisc, "\033[0n", 4, false);
+		}
+	}
 }
 
 void VtParserCSI::ToggleModeH()
 {
 	if (!CheckCompat(VT100)) return;
+
+	{
+		int i;
+		for (i = 0; i < term->esc_nargs; i++)
+			toggle_mode(term, term->esc_args[i],
+				term->esc_query, true);
+	}
 }
 
 void VtParserCSI::ToggleModeL()
 {
 	if (!CheckCompat(VT100)) return;
+
+	{
+		int i;
+		for (i = 0; i < term->esc_nargs; i++)
+			toggle_mode(term, term->esc_args[i],
+				term->esc_query, false);
+	}
 }
 
 void VtParserCSI::MediaCopy()
 {
 	if (!CheckCompat(VT100)) return;
+
+	{
+		char *printer;
+		if (term->esc_nargs != 1) break;
+		if (term->esc_args[0] == 5 &&
+			(printer = conf_get_str(term->conf,
+				CONF_printer))[0]) {
+			term->printing = true;
+			term->only_printing = !term->esc_query;
+			term->print_state = 0;
+			term_print_setup(term, printer);
+		}
+		else if (term->esc_args[0] == 4 &&
+			term->printing) {
+			term_print_finish(term);
+		}
+	}
 }
 
 void VtParserCSI::ClearTabs()
 {
 	if (!CheckCompat(VT100)) return;
+
+	if (term->esc_nargs == 1) {
+		if (term->esc_args[0] == 0) {
+			term->tabs[term->curs.x] = false;
+		}
+		else if (term->esc_args[0] == 3) {
+			int i;
+			for (i = 0; i < term->cols; i++)
+				term->tabs[i] = false;
+		}
+	}
 }
 
 void VtParserCSI::SetScollMargin()
 {
 	if (!CheckCompat(VT100)) return;
+
+	if (term->esc_nargs <= 2) {
+		int top, bot;
+		CLAMP(term->esc_args[0], term->rows);
+		CLAMP(term->esc_args[1], term->rows);
+		top = def(term->esc_args[0], 1) - 1;
+		bot = (term->esc_nargs <= 1
+			|| term->esc_args[1] == 0 ?
+			term->rows :
+			def(term->esc_args[1], term->rows)) - 1;
+		if (bot >= term->rows)
+			bot = term->rows - 1;
+		/* VTTEST Bug 9 - if region is less than 2 lines
+		* don't change region.
+		*/
+		if (bot - top > 0) {
+			term->marg_t = top;
+			term->marg_b = bot;
+			term->curs.x = 0;
+			/*
+			* I used to think the cursor should be
+			* placed at the top of the newly marginned
+			* area. Apparently not: VMS TPU falls over
+			* if so.
+			*
+			* Well actually it should for
+			* Origin mode - RDB
+			*/
+			term->curs.y = (term->dec_om ?
+				term->marg_t : 0);
+			seen_disp_event(term);
+		}
+	}
 }
 
 void VtParserCSI::SetGraphics()

@@ -15,12 +15,8 @@ void VtCharTrans::SetTerm(terminal_tag* p)
 	term = p;
 }
 
-void VtCharTrans::Translate(char c)
+unsigned long VtCharTrans::Translate(unsigned char c)
 {
-	m_orgin = c;
-	SetResult(c);
-	m_break = false;
-
 	if (IsUtf())
 	{
 		return ByUtf();
@@ -33,199 +29,211 @@ void VtCharTrans::Translate(char c)
 	return ByCharset();
 }
 
-bool VtCharTrans::IsBreak()
-{
-	return m_break;
-}
-
-void VtCharTrans::Break()
-{
-	m_break = true;
-}
-
-void VtCharTrans::SetResult(unsigned long result)
-{
-	m_result = result;
-}
-
-void VtCharTrans::ByUtf()
+unsigned long VtCharTrans::ByUtf(unsigned char c)
 {
 	switch (term->utf_state) 
 	{
 	case 0:
-		ByUtf_0();
+		ByUtf_0(c);
 		break;
 	case 1:
 	case 2:
 	case 3:
 	case 4:
 	case 5:
-		ByUtf_1();
+		ByUtf_1(c);
 		break;
 	default:
 		break;
 	}
 }
 
-void VtCharTrans::ByUtf_0()
+unsigned long VtCharTrans::ByUtf_0(unsigned char c)
 {
-	if (m_orgin < 0x80) 
+	if (c < 0x80) 
 	{
 		/* UTF-8 must be stateless so we ignore iso2022. */
-		if (term->ucsdata->unitab_ctrl[m_orgin] != 0xFF)
+		if (term->ucsdata->unitab_ctrl[c] != 0xFF) 
 		{
-			SetResult(term->ucsdata->unitab_ctrl[m_orgin]);
+			return term->ucsdata->unitab_ctrl[c];
 		}
-		else
+		else if ((term->utf8linedraw) &&
+			(term->cset_attr[term->cset] == CSET_LINEDRW)) 
 		{
-			unsigned long result = ((unsigned char)m_orgin) | CSET_ASCII;
-			SetResult(result);
+			/* Linedraw characters are explicitly enabled */
+			return c | CSET_LINEDRW;
 		}
-		
-		return;
+		else 
+		{
+			return c | CSET_ASCII;
+		}
 	}
-	else if ((m_orgin & 0xe0) == 0xc0) 
+	else if ((c & 0xe0) == 0xc0) 
 	{
-		term->utf_size = term->utf_state = 1;
-		term->utf_char = (m_orgin & 0x1f);
+		utf8->size = utf8->state = 1;
+		utf8->chr = (c & 0x1f);
 	}
-	else if ((m_orgin & 0xf0) == 0xe0) 
+	else if ((c & 0xf0) == 0xe0) 
 	{
-		term->utf_size = term->utf_state = 2;
-		term->utf_char = (m_orgin & 0x0f);
+		utf8->size = utf8->state = 2;
+		utf8->chr = (c & 0x0f);
 	}
-	else if ((m_orgin & 0xf8) == 0xf0) 
+	else if ((c & 0xf8) == 0xf0) 
 	{
-		term->utf_size = term->utf_state = 3;
-		term->utf_char = (m_orgin & 0x07);
+		utf8->size = utf8->state = 3;
+		utf8->chr = (c & 0x07);
 	}
-	else if ((m_orgin & 0xfc) == 0xf8)
+	else if ((c & 0xfc) == 0xf8) 
 	{
-		term->utf_size = term->utf_state = 4;
-		term->utf_char = (m_orgin & 0x03);
+		utf8->size = utf8->state = 4;
+		utf8->chr = (c & 0x03);
 	}
-	else if ((m_orgin & 0xfe) == 0xfc)
+	else if ((c & 0xfe) == 0xfc) 
 	{
-		term->utf_size = term->utf_state = 5;
-		term->utf_char = (m_orgin & 0x01);
+		utf8->size = utf8->state = 5;
+		utf8->chr = (c & 0x01);
 	}
 	else 
 	{
-		m_orgin = UCSERR;
-		return;
+		return UCSINVALID;
 	}
 
-	Break();
+	return UCSINCOMPLETE;
 }
 
-void VtCharTrans::ByUtf_1()
+unsigned long VtCharTrans::ByUtf_1(unsigned char c)
 {
-	if ((c & 0xC0) != 0x80)
+	if ((c & 0xC0) != 0x80) 
 	{
-		unget = c;
-		c = UCSERR;
-		term->utf_state = 0;
-		return;
+		utf8->state = 0;
+		return UCSTRUNCATED;   /* caller will then give us the
+							   * same byte again */
+	}
+	utf8->chr = (utf8->chr << 6) | (c & 0x3f);
+	if (--utf8->state)
+	{
+		return UCSINCOMPLETE;
 	}
 
-	term->utf_char = (term->utf_char << 6) | (c & 0x3f);
-	if (--term->utf_state)
-	{
-		Break();
-		return;
-	}
-
-	c = term->utf_char;
+	unsigned long t = utf8->chr;
 
 	/* Is somebody trying to be evil! */
-	if (c < 0x80 ||
-		(c < 0x800 && term->utf_size >= 2) ||
-		(c < 0x10000 && term->utf_size >= 3) ||
-		(c < 0x200000 && term->utf_size >= 4) ||
-		(c < 0x4000000 && term->utf_size >= 5))
-		c = UCSERR;
+	if (t < 0x80 ||
+		(t < 0x800 && utf8->size >= 2) ||
+		(t < 0x10000 && utf8->size >= 3) ||
+		(t < 0x200000 && utf8->size >= 4) ||
+		(t < 0x4000000 && utf8->size >= 5))
+	{
+		return UCSINVALID;
+	}
 
 	/* Unicode line separator and paragraph separator are CR-LF */
-	if (c == 0x2028 || c == 0x2029)
-		c = 0x85;
+	if (t == 0x2028 || t == 0x2029)
+	{
+		return 0x85;
+	}
 
 	/* High controls are probably a Baaad idea too. */
-	if (c < 0xA0)
-		c = 0xFFFD;
+	if (t < 0xA0)
+	{
+		return 0xFFFD;
+	}
 
 	/* The UTF-16 surrogates are not nice either. */
 	/*       The standard give the option of decoding these:
-	 *       I don't want to! */
-	if (c >= 0xD800 && c < 0xE000)
-		c = UCSERR;
+	*       I don't want to! */
+	if (t >= 0xD800 && t < 0xE000)
+	{
+		return UCSINVALID;
+	}
 
 	/* ISO 10646 characters now limited to UTF-16 range. */
-	if (c > 0x10FFFF)
-		c = UCSERR;
+	if (t > 0x10FFFF)
+	{
+		return UCSINVALID;
+	}
 
 	/* This is currently a TagPhobic application.. */
-	if (c >= 0xE0000 && c <= 0xE007F)
+	if (t >= 0xE0000 && t <= 0xE007F)
 	{
-		Break();
-		return;
+		return UCSINCOMPLETE;
 	}
 
 	/* U+FEFF is best seen as a null. */
-	if (c == 0xFEFF)
+	if (t == 0xFEFF)
 	{
-		Break();
-		return;
+		return UCSINCOMPLETE;
 	}
 
 	/* But U+FFFE is an error. */
-	if (c == 0xFFFE || c == 0xFFFF)
-		c = UCSERR;
+	if (t == 0xFFFE || t == 0xFFFF)
+	{
+		return UCSINVALID;
+	}
+
+	return t;
 }
 
-void VtCharTrans::ByAcs()
+unsigned long VtCharTrans::ByAcs(unsigned char c)
 {
+	/* Are we in the nasty ACS mode? Note: no sco in utf mode. */
 	if (term->sco_acs == 2)
 	{
 		c |= 0x80;
 	}
 
-	c |= CSET_SCOACS;
+	return c | CSET_SCOACS;
 }
 
-void VtCharTrans::ByCharset()
+unsigned long VtCharTrans::ByCharset(unsigned char c)
 {
 	int attr = GetCharset();
-	switch (attr)
+	switch (term->cset_attr[term->cset]) 
 	{
 		/*
-		 * Linedraw characters are different from 'ESC ( B'
-		 * only for a small range. For ones outside that
-		 * range, make sure we use the same font as well as
-		 * the same encoding.
-		 */
+		* Linedraw characters are different from 'ESC ( B'
+		* only for a small range. For ones outside that
+		* range, make sure we use the same font as well as
+		* the same encoding.
+		*/
 	case CSET_LINEDRW:
 		if (term->ucsdata->unitab_ctrl[c] != 0xFF)
-			c = term->ucsdata->unitab_ctrl[c];
+		{
+			return term->ucsdata->unitab_ctrl[c];
+		}
 		else
-			c = ((unsigned char)c) | CSET_LINEDRW;
+		{
+			return c | CSET_LINEDRW;
+		}
 		break;
 
 	case CSET_GBCHR:
 		/* If UK-ASCII, make the '#' a LineDraw Pound */
-		if (c == '#') {
-			c = '}' | CSET_LINEDRW;
-			break;
+		if (c == '#')
+		{
+			return '}' | CSET_LINEDRW;
 		}
-	/*FALLTHROUGH*/ case CSET_ASCII:
+		/* fall through */
+
+	case CSET_ASCII:
 		if (term->ucsdata->unitab_ctrl[c] != 0xFF)
-			c = term->ucsdata->unitab_ctrl[c];
+		{
+			return term->ucsdata->unitab_ctrl[c];
+		}			
 		else
-			c = ((unsigned char)c) | CSET_ASCII;
+		{
+			return c | CSET_ASCII;
+		}
 		break;
 	case CSET_SCOACS:
-		if (c >= ' ') c = ((unsigned char)c) | CSET_SCOACS;
+		if (c >= ' ')
+		{
+			return c | CSET_SCOACS;
+		}
 		break;
 	}
+
+	return c;
 }
 
 bool VtCharTrans::IsAcsMode()

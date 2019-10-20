@@ -45,3 +45,10 @@
 #define ATTR_COLOURS 0x03FFFFU
 #define ATTR_FGSHIFT 0
 #define ATTR_BGSHIFT 9
+
+enum SelState{
+	NO_SELECTION = 0, 
+	ABOUT_TO, 
+	DRAGGING, 
+	SELECTED
+};

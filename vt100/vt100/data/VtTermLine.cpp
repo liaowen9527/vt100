@@ -27,10 +27,17 @@ void VtTermLine::Resize(int count)
 
 }
 
+void VtTermLine::Clear()
+{
+
+}
+
 void VtTermLine::Clear(int col)
 {
 	assert(col >=0 && col < Cols());
 
 
 }
+
+
 

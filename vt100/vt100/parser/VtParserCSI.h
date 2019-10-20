@@ -33,6 +33,7 @@ protected:
 
 	void Postion();
 
+	void RepeateGrap();
 	void ReportXtermVersion();
 
 	void EraseParts();

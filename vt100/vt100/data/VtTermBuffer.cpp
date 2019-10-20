@@ -11,6 +11,26 @@ VtTermBuffer::~VtTermBuffer()
 
 }
 
+void VtTermBuffer::PushFront(VtTermLine& line)
+{
+	m_lines.push_front(line);
+}
+
+VtTermLine VtTermBuffer::PopFront()
+{
+	m_lines.pop_front();
+}
+
+void VtTermBuffer::PushBack(VtTermLine& line)
+{
+	m_lines.push_back(line);
+}
+
+VtTermLine VtTermBuffer::PopBack()
+{
+	return m_lines.pop_back();
+}
+
 void VtTermBuffer::CheckLineSize(int row)
 {
 	Size size = m_vtTerm->GetSize();

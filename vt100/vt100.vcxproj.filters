@@ -126,9 +126,6 @@
     <ClInclude Include="vt100\data\VtData.h">
       <Filter>vt100\data</Filter>
     </ClInclude>
-    <ClInclude Include="vt100\data\terminal_tag.h">
-      <Filter>vt100\data</Filter>
-    </ClInclude>
     <ClInclude Include="vt100\define\VtDefine.h">
       <Filter>vt100\define</Filter>
     </ClInclude>

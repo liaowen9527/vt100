@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-struct terminal_tag;
+struct VtTerm;
 
 class VtParserBase
 {
@@ -10,7 +10,7 @@ public:
 	virtual ~VtParserBase();
 
 public:
-	void SetTerm(terminal_tag* p);
+	void SetTerm(VtTerm* p);
 	unsigned long GetChar();
 
 	void Parse(char ch);
@@ -26,6 +26,6 @@ protected:
 
 protected:
 	unsigned long c;
-	terminal_tag* term;
+	VtTerm* term;
 };
 

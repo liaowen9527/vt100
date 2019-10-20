@@ -11,10 +11,8 @@ public:
 	virtual void Parse();
 
 protected:
-	bool ChangeQuery();
-
 	void EnterCSI();
-	void Xterm();
+	void EnterOSC();
 
 	void SaveCursor();
 	void RestoreCursor();

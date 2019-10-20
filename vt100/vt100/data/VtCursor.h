@@ -32,6 +32,9 @@ public:
 	void Restore();
 
 public:
+	bool IsVisible();
+
+public:
 	int ToInsideRow(int row);
 	int ToInsideCol(int col);
 

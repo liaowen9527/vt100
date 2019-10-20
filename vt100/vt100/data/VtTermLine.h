@@ -12,6 +12,7 @@ public:
 	int Cols();
 	void Resize(int count);
 
+	void Clear();
 	void Clear(int col);
 
 protected:

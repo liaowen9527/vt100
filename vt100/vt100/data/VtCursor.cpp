@@ -44,7 +44,7 @@ void VtCursor::Move(int row, int col)
 void VtCursor::MoveTo(int row, int col, bool visible)
 {
 	col = ToInsideCol(col);
-	if (IsVisibleRow(m_tag.row) || visible)
+	if (IsVisible() || visible)
 	{
 		row = ToVisibleRow(row);
 	}
@@ -80,6 +80,11 @@ void VtCursor::Restore()
 		m_tag.wrapnext = false;
 	}
 		
+}
+
+bool VtCursor::IsVisible()
+{
+	return term->IsVisibleRow(Row());
 }
 
 int VtCursor::ToInsideRow(int row)

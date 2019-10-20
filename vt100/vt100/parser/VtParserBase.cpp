@@ -12,7 +12,7 @@ VtParserBase::~VtParserBase()
 
 }
 
-void VtParserBase::SetTerm(terminal_tag* p)
+void VtParserBase::SetTerm(VtTerm* p)
 {
 	term = p;
 }

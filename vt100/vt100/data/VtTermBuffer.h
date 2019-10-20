@@ -10,6 +10,15 @@ public:
 	~VtTermBuffer();
 
 public:
+	void PushFront(VtTermLine& line);
+	VtTermLine PopFront();
+	
+	void PushBack(VtTermLine& line);
+	VtTermLine PopBack();
+	
+	
+	
+
 	void CheckLineSize(int row);
 	void InsertChar(int nCount);
 
