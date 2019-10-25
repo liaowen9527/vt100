@@ -1,5 +1,5 @@
 #include "VtParserTopLevel.h"
-#include "../define/VtType.h"
+
 
 
 VtParserTopLevel::VtParserTopLevel()
@@ -18,6 +18,8 @@ VtParserTopLevel::~VtParserTopLevel()
 */
 void VtParserTopLevel::Parse()
 {
+	m_buffer->DisplayChar();
+
 	termline *cline = scrlineptr(term->curs.y);
 	int width = GetCharWidth(c);
 

@@ -1,13 +1,11 @@
 #pragma once
-#include "../VtCtxNode.h"
+#include "VtCtrlNode.h"
 
-class VtCtrlCharset : public VtCtxNode
+class VtCtrlCharset : public VtCtrlNode
 {
 public:
 	VtCtrlCharset();
 	~VtCtrlCharset();
-
-	void Init();
 
 public:
 	//SCS -- Select Character Set

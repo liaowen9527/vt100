@@ -1,8 +1,8 @@
 #pragma once
-#include "../VtCtxNode.h"
+#include "VtCtrlNode.h"
 
 
-class VtCtrlUnknown : public VtCtxNode
+class VtCtrlUnknown : public VtCtrlNode
 {
 public:
 	VtCtrlUnknown();

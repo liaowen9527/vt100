@@ -28,9 +28,19 @@ int VtCursor::Row()
 	return m_tag.row;
 }
 
+void VtCursor::SetRow(int row)
+{
+	m_tag.row = row;
+}
+
 int VtCursor::Col()
 {
 	return m_tag.col;
+}
+
+void VtCursor::SetCol(int col)
+{
+	m_tag.col = col;
 }
 
 void VtCursor::Move(int row, int col)
@@ -54,6 +64,39 @@ void VtCursor::MoveTo(int row, int col, bool visible)
 	m_tag.row = row;
 	m_tag.col = col;
 	m_tag.wrapnext = false;
+}
+
+void VtCursor::NextLine()
+{
+	Margin margin = term->m_margin;
+	int row = Row();
+	if (row == margin.bottom)
+	{
+		term->ScrollDown_sb(margin, 1);
+	}
+	else if (row < term->m_size.rows - 1)
+	{
+		SetRow(row + 1);
+	}
+
+	term->wrapnext = false;
+}
+
+void VtCursor::ReverseIndex()
+{
+	Margin margin = term->m_margin;
+	int row = Row();
+
+	if (row == margin.top)
+	{
+		term->ScrollUp(margin, 1);
+	}
+	else if (row > 0)
+	{
+		SetRow(row + 1);
+	}
+
+	term->wrapnext = false;
 }
 
 void VtCursor::Save()

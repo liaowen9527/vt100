@@ -4,7 +4,7 @@ http://ascii-table.com/ansi-escape-sequences-vt-100.php
 */
 
 #include "VtParserOSC_P.h"
-#include "../define/VtType.h"
+
 
 VtParserOSC_P::VtParserOSC_P()
 {

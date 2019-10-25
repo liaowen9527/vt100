@@ -9,10 +9,10 @@ public:
 	VtData();
 	virtual ~VtData();
 
-	void SetTerm(VtTerm* p);
+	VtTerm* GetTerm();
+	void SetTerm(VtTerm* term);
 
 protected:
-	VtTerm * term;
 	VtTerm* m_vtTerm;
 };
 

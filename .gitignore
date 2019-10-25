@@ -13,6 +13,7 @@
 *.vcxproj.user
 
 output/**
+vt100/Debug/**
 
 # Files built by Visual Studio
 *_i.c

@@ -1,46 +1,34 @@
 #pragma once
-#include "../VtCtxNode.h"
+#include "VtCtrlNode.h"
 
-class VtCtrlCursor : public VtCtxNode
+class VtCtrlCursor : public VtCtrlNode
 {
 public:
 	VtCtrlCursor();
 	~VtCtrlCursor();
-	
-	void Init();
 
 public:
-	/* <Esc>[{Count}A	Move cursor up n lines	CUU */
 	void Up();
-
-	/* <Esc>[{Count}B	Move cursor down n lines	CUD */
 	void Down();
-
-	/* <Esc>[{Count}C	Move cursor right n lines	CUF */
 	void Forward();	
-
-	/* <Esc>[{Count}D	Move cursor left n lines	CUB */
 	void Backward();
 
-	/* <Esc>H	Move cursor to upper left corner	cursorhome */
-	/* <Esc>[H	Move cursor to upper left corner	cursorhome */
-	/* <Esc>[;H	Move cursor to upper left corner	cursorhome */
-	/* <Esc>[f	Move cursor to upper left corner	hvhome */
-	/* <Esc>[;f	Move cursor to upper left corner	hvhome */
-	void Home();
-	
-	/* <Esc>[{Line};{Column}H	Move cursor to screen location v, h	CUP */
-	/* <Esc>[{Line};{Column}f	Move cursor to screen location v, h	CUP */
+	void Backspace();
+
+	void DownAndCR();
+	void UpAndCR();
+
+	void Horizontal();
+	void Vertical();
+
 	void SetPosition();
 
-	/* <Esc>E	Move to next line	NEL */
+	void CSI_Z();
 	void NextLine();
 
-	/* <ESC>[s Save current cursor position. */
-	/* <Esc>7	Save cursor position and attributes	DECSC */
-	void Save();
+	void ShowOrHide();
+	void SetCursorOn();
 
-	/* <ESC>[u Restores cursor position after a Save Cursor.*/
-	/* <Esc>8	Restore cursor position and attributes	DECSC */
+	void Save();
 	void Restore();
 };

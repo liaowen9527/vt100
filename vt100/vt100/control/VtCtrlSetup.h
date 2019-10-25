@@ -1,73 +1,39 @@
 #pragma once
-#include "../VtCtxNode.h"
+#include "VtCtrlNode.h"
 #include <string>
 
 //The h and l codes are used for setting terminal/display mode, and vary depending on the implementation. Line Wrap is one of the few setup codes that tend to be used consistently:
-class VtCtrlSetup : public VtCtxNode
+class VtCtrlSetup : public VtCtrlNode
 {
 public:
 	VtCtrlSetup();
 	~VtCtrlSetup();
 
-	void Init();
-
 public:
-	/*
-	Reset Device		<ESC>c
-	Reset all terminal settings to default.
-	*/
-	void Reset();
-
-	/* <ESC>[{attr1};...;{attrn}h Set Mode SM*/
-	/* <Esc>[20h	Set new line mode	LMN */
-	/* <Esc>[?1h	Set cursor key to application	DECCKM */
-	/* <Esc>[?2h	Set ANSI (versus VT52)	DECANM */
-	/* <Esc>[?3h	Set number of columns to 132	DECCOLM */
-	/* <Esc>[?4h	Set smooth scrolling	DECSCLM */
-	/* <Esc>[?5h	Set reverse video on screen	DECSCNM */
-	/* <Esc>[?6h	Set origin to relative	DECOM */
-	/* <Esc>[?7h	Set auto-wrap mode	DECAWM */
-	/* <Esc>[?8h	Set auto-repeat mode	DECARM */
-	/* <Esc>[?9h	Set interlacing mode	DECINLM */
-	void SetMode();
-
-	/* <ESC>[{attr1};...;{attrn}l Reset Mode RM */
-	/* <Esc>[20l	Set line feed mode	LMN */
-	/* <Esc>[?1l	Set cursor key to cursor	DECCKM */
-	/* <Esc>[?2l	Set VT52 (versus ANSI)	DECANM */
-	/* <Esc>[?3l	Set number of columns to 80	DECCOLM */
-	/* <Esc>[?4l	Set jump scrolling	DECSCLM */
-	/* <Esc>[?5l	Set normal video on screen	DECSCNM */
-	/* <Esc>[?6l	Set origin to absolute	DECOM */
-	/* <Esc>[?7l	Reset auto-wrap mode	DECAWM */
-	/* <Esc>[?8l	Reset auto-repeat mode	DECARM */
-	/* <Esc>[?9l	Reset interlacing mode	DECINLM */
-	void ResetMode();
-
-protected:
-	bool FilterAttrH(const std::string& attr, bool bLast);
-	bool FilterAttrL(const std::string& attr, bool bLast);
-	bool IsAttr(const std::string& attr);
+	void ToggleModeH();
+	void ToggleModeL();
 
 protected:	
-	void DoSetMode(int code, bool high);
-	void AppCursorKeys(bool high);
-	void Vt52Mode(bool high);
-	void Columns(bool high);
-	void ReverseVideo(bool high);
-	void OriginMode(bool high);
-	void AutoWrap(bool high);
-	void AutoKeyRepeat(bool high);
-	void LocalEditMode(bool high);
-	void EnableCursor(bool high);
-	void AlternateScreen(bool high);
-	void XtermMouse1(bool high);
-	void XtermMouse2(bool high);
-	void XtermExtendMouse(bool high);
-	void UrxvtExtendMouse(bool high);
-	void SaveCursor(bool high);
-	void Mode1049(bool high);
-	void XtermBracketedPaste(bool high);
+	void ToggleMode(int code, int query, bool state);
+	void ToggleMode_q0(int code, bool state);
+	void ToggleMode_q1(int code, bool state);
+
+	void AppCursorKeys(bool state);
+	void Vt52Mode(bool state);
+	void Columns(bool state);
+	void ReverseVideo(bool state);
+	void OriginMode(bool state);
+	void AutoWrap(bool state);
+	void AutoKeyRepeat(bool state);
+	void EnableCursor(bool state);
+	void AlternateScreen(bool state, bool reset, bool keep_cur_pos);
+	void XtermMouse1(bool state);
+	void XtermMouse2(bool state);
+	void XtermExtendMouse(bool state);
+	void UrxvtExtendMouse(bool state);
+	void SaveCursor(bool state);
+	void Mode1049(bool state);
+	void XtermBracketedPaste(bool state);
 
 protected:
 	bool m_app_cursor_keys;

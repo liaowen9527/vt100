@@ -4,7 +4,7 @@ http://ascii-table.com/ansi-escape-sequences-vt-100.php
 */
 
 #include "VtParserESC.h"
-#include "../define/VtType.h"
+
 
 VtParserESC::VtParserESC()
 {
@@ -178,12 +178,10 @@ void VtParserESC::CrLf()
 {
 	if (!CheckCompat(VT100)) return;
 
-	term->curs.x = 0;
-	if (term->curs.y == term->marg_b)
-		scroll(term, term->marg_t, term->marg_b, 1, true);
-	else if (term->curs.y < term->rows - 1)
-		term->curs.y++;
-	term->wrapnext = false;
+	VtCursor& cursor;
+	cursor.SetCol(0);
+	cursor.NextLine();
+	
 	seen_disp_event(term);
 }
 
@@ -191,11 +189,9 @@ void VtParserESC::ReverseIndex()
 {
 	if (!CheckCompat(VT100)) return;
 
-	if (term->curs.y == term->marg_t)
-		scroll(term, term->marg_t, term->marg_b, -1, true);
-	else if (term->curs.y > 0)
-		term->curs.y--;
-	term->wrapnext = false;
+	VtCursor& cursor;
+	cursor.ReverseIndex();
+	
 	seen_disp_event(term);
 }
 
@@ -203,10 +199,9 @@ void VtParserESC::TypeQuery()
 {
 	if (!CheckCompat(VT100)) return;
 
-	if (term->ldisc && term->id_string[0])
+	if (term->id_string[0])
 	{
-		ldisc_send(term->ldisc, term->id_string,
-			strlen(term->id_string), false);
+		term->m_ldisc.Send(term->id_string, strlen(term->id_string), false);
 	}
 }
 
@@ -214,16 +209,24 @@ void VtParserESC::RestorePowerOn()
 {
 	if (!CheckCompat(VT100)) return;
 
-	power_on(term, true);
-	if (term->ldisc)   /* cause ldisc to notice changes */
-		ldisc_echoedit_update(term->ldisc);
-	if (term->reset_132) {
+	term->PowerOn(true);
+	term->m_ldisc.UpdateEchoEdit();
+	
+	if (term->reset_132) 
+	{
 		if (!term->no_remote_resize)
+		{
 			win_request_resize(term->win, 80, term->rows);
+		}
+			
 		term->reset_132 = false;
 	}
+
 	if (term->scroll_on_disp)
+	{
 		term->disptop = 0;
+	}
+		
 	seen_disp_event(term);
 }
 
@@ -231,7 +234,7 @@ void VtParserESC::SetOneTab()
 {
 	if (!CheckCompat(VT100)) return;
 
-	term->tabs[term->curs.x] = true;
+	term->tabs[term->m_cursor.Col()] = true;
 }
 
 void VtParserESC::FillScreen()
@@ -240,9 +243,10 @@ void VtParserESC::FillScreen()
 
 	termline *ldata;
 	int i, j;
-	pos scrtop, scrbot;
+	Postion scrtop, scrbot;
 
-	for (i = 0; i < term->rows; i++) {
+	for (i = 0; i < term->rows; i++) 
+	{
 		ldata = scrlineptr(i);
 		check_line_size(term, ldata);
 		for (j = 0; j < term->cols; j++) {
@@ -253,24 +257,22 @@ void VtParserESC::FillScreen()
 		ldata->lattr = LATTR_NORM;
 	}
 	if (term->scroll_on_disp)
+	{
 		term->disptop = 0;
+	}
+		
 	seen_disp_event(term);
 	scrtop.x = scrtop.y = 0;
 	scrbot.x = 0;
 	scrbot.y = term->rows;
-	check_selection(term, scrtop, scrbot);
+	term->CheckSelection(term, scrtop, scrbot);
 }
 
 void VtParserESC::DoubleHeightLine(int lattr)
 {
 	if (!CheckCompat(VT100)) return;
 
-	int nlattr;
-	termline *ldata;
-
-	ldata = scrlineptr(term->curs.y);
-	check_line_size(term, ldata);
-	check_trust_status(term, ldata);
+	term->m_buffer.CheckLineSize(term->m_size.rows);
 	ldata->lattr = lattr;
 }
 

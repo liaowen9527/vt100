@@ -10,7 +10,12 @@ VtData::~VtData()
 
 }
 
-void VtData::SetTerm(VtTerm* p)
+VtTerm* VtData::GetTerm()
 {
-	term = p;
+	return m_vtTerm;
+}
+
+void VtData::SetTerm(VtTerm* term)
+{
+	m_vtTerm = term;
 }

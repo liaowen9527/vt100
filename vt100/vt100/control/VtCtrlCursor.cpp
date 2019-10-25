@@ -11,107 +11,182 @@ VtCtrlCursor::~VtCtrlCursor()
 
 }
 
-void VtCtrlCursor::Init()
-{
-	VtFmtManager& fmtManager = m_context->fmtManager;
-
-	fmtManager.AddAttrFmt({ VT_STR_ESC, "[", VT_STR_NUM, "A" }, std::bind(&VtCtrlCursor::Up, this));
-	fmtManager.AddAttrFmt({ VT_STR_ESC, "[", VT_STR_NUM, "B" }, std::bind(&VtCtrlCursor::Down, this));
-	fmtManager.AddAttrFmt({ VT_STR_ESC, "[", VT_STR_NUM, "C" }, std::bind(&VtCtrlCursor::Forward, this));
-	fmtManager.AddAttrFmt({ VT_STR_ESC, "[", VT_STR_NUM, "D" }, std::bind(&VtCtrlCursor::Backward, this));
-	fmtManager.AddFmt({ VT_STR_ESC, "[H" }, std::bind(&VtCtrlCursor::Home, this));
-	fmtManager.AddFmt({ VT_STR_ESC, "[;H" }, std::bind(&VtCtrlCursor::Home, this));
-	fmtManager.AddFmt({ VT_STR_ESC, "[f" }, std::bind(&VtCtrlCursor::Home, this));
-	fmtManager.AddFmt({ VT_STR_ESC, "[;f" }, std::bind(&VtCtrlCursor::Home, this));
-	fmtManager.AddAttrFmt({ VT_STR_ESC, "[", VT_STR_NUM, ";", VT_STR_NUM, "H" }, std::bind(&VtCtrlCursor::SetPosition, this));
-	fmtManager.AddAttrFmt({ VT_STR_ESC, "[", VT_STR_NUM, ";", VT_STR_NUM, "f" }, std::bind(&VtCtrlCursor::SetPosition, this));
-
-	fmtManager.AddFmt({ VT_STR_ESC, "[E" }, std::bind(&VtCtrlCursor::NextLine, this));
-
-	fmtManager.AddFmt({ VT_STR_ESC, "[s" }, std::bind(&VtCtrlCursor::Save, this));
-	fmtManager.AddFmt({ VT_STR_ESC, "[u" }, std::bind(&VtCtrlCursor::Restore, this));
-	fmtManager.AddFmt({ VT_STR_ESC, "7" }, std::bind(&VtCtrlCursor::Save, this));
-	fmtManager.AddFmt({ VT_STR_ESC, "8" }, std::bind(&VtCtrlCursor::Restore, this));
-
-}
-
 void VtCtrlCursor::Up()
 {
-	int count = m_context->buffer.GetIntAttr(0);
-	count = (count == 0 ? 1 : count);
+	int offset = m_args->GetArg(0, m_term->Rows(), 1);
+	m_cursor->Move(-offset, 0);
 
-	VtCursor& cursor = m_context->terminal.Cursor();
-	cursor.Move(-count, 0);
+	seen_disp_event(term);
 }
 
 void VtCtrlCursor::Down()
 {
-	int count = m_context->buffer.GetIntAttr(0);
-	count = (count == 0 ? 1 : count);
+	int offset = m_args->GetArg(0, m_term->Rows(), 1);
+	m_cursor->Move(offset, 0);
 
-	VtCursor& cursor = m_context->terminal.Cursor();
-
-	cursor.Move(count, 0);
+	seen_disp_event(term);
 }
 
 void VtCtrlCursor::Forward()
 {
-	int count = m_context->buffer.GetIntAttr(0);
-	count = (count == 0 ? 1 : count);
+	int offset = m_args->GetArg(0, m_term->Cols(), 1);
+	m_cursor->Move(0, offset);
 
-	VtCursor& cursor = m_context->terminal.Cursor();
-
-	cursor.Move(0, count);
+	seen_disp_event(term);
 }
 
 void VtCtrlCursor::Backward()
 {
-	int count = m_context->buffer.GetIntAttr(0);
-	count = (count == 0 ? 1 : count);
+	int offset = m_args->GetArg(0, m_term->Cols(), 1);
+	m_cursor->Move(0, -offset);
 
-	VtCursor& cursor = m_context->terminal.Cursor();
-
-	cursor.Move(0, -count);
+	seen_disp_event(term);
 }
 
-void VtCtrlCursor::Home()
+void VtCtrlCursor::Backspace()
 {
-	VtCursor& cursor = m_context->terminal.Cursor();
-	terminal_tag& tag = m_context->terminal.tag();
-	if (tag.dec_om)
-	{
-		cursor.MoveTo(0, 0, true);
-	}
+	if (term->curs.x == 0 && (term->curs.y == 0 || !term->wrap))
+		/* do nothing */;
+	else if (term->curs.x == 0 && term->curs.y > 0)
+		term->curs.x = term->cols - 1, term->curs.y--;
+	else if (term->wrapnext)
+		term->wrapnext = false;
 	else
-	{
-		cursor.Set(0, 0);
-	}
+		term->curs.x--;
+	seen_disp_event(term);
+}
+
+void VtCtrlCursor::DownAndCR()
+{
+	int offset = term->m_args.GetArg(0, term->m_size.cols, 1);
+	term->m_cursor.Move(0, offset);
+
+	seen_disp_event(term);
+}
+
+void VtCtrlCursor::UpAndCR()
+{
+	int offset = term->m_args.GetArg(0, term->m_size.rows, 1);
+	term->m_cursor.MoveTo(term->m_cursor.Row() + offset, 0);
+
+	seen_disp_event(term);
+}
+
+void VtCtrlCursor::Horizontal()
+{
+	int col = term->m_args.GetArg(0, term->m_size.cols, 1) - 1;
+	term->m_cursor.MoveTo(term->m_cursor.Row(), col);
+
+	seen_disp_event(term);
+}
+
+void VtCtrlCursor::Vertical()
+{
+	int arg = term->m_args.GetArg(0, term->m_size.rows, 1);
+	int top = term->dec_om ? term->marg_t : 0;
+	int row = top + arg - 1;
+
+	term->m_cursor.MoveTo(row, term->m_cursor.Col(), term->dec_om);
+
+	seen_disp_event(term);
 }
 
 void VtCtrlCursor::SetPosition()
 {
-	int row = m_context->buffer.GetIntAttr(0) - 1;
-	int col = m_context->buffer.GetIntAttr(1) - 1;
-	VtCursor& cursor = m_context->terminal.Cursor();
-	terminal_tag& tag = m_context->terminal.tag();
+	if (term->esc_nargs < 2)
+		term->esc_args[1] = ARG_DEFAULT;
 
-	row = cursor.ToInsideRow(row);
-	col = cursor.ToInsideRow(col);
+	int arg1 = term->m_args.GetArg(0, term->m_size.rows, 1);
+	int arg2 = term->m_args.GetArg(1, term->m_size.cols, 1);
 
-	if (tag.dec_om)
+	int top = term->dec_om ? term->marg_t : 0;
+	int row = top + arg1 - 1;
+	int col = arg2 - 1;
+
+	term->m_cursor.MoveTo(row, col, term->dec_om);
+
+	seen_disp_event(term);
+}
+
+void VtCtrlCursor::CSI_Z()
+{
+	if (!CheckCompat(OTHER))
 	{
-		cursor.MoveTo(row, col, true);
+		return;
 	}
-	else
+
+	int arg = m_args->GetArg(0, m_term->Cols(), 1);
+	Postion temp = term->curs;
+
+	for (int i = arg; i > 0 && temp.col > 0; i--)
 	{
-		cursor.Set(row, col);
+		do
+		{
+			temp.col--;
+			if (temp.col <= 0)
+			{
+				break;
+			}
+
+			if (term->tabs[temp.col])
+			{
+				break;
+			}
+		} while (true);
 	}
+
+	term->curs = temp;
+
+	check_selection(term, temp, term->curs);
 }
 
 void VtCtrlCursor::NextLine()
 {
 	VtCursor& cursor = m_context->terminal.Cursor();
 	cursor.MoveTo(cursor.Row() + 1, 0, false);
+}
+
+void VtCtrlCursor::ShowOrHide()
+{
+	if (!CheckCompat(SCOANSI))
+	{
+		return;
+	}
+	
+	int arg = m_args->GetArg(0);
+	switch (arg)
+	{
+	case 0:  /* hide cursor */
+		term->cursor_on = false;
+		break;
+	case 1:  /* restore cursor */
+		term->big_cursor = false;
+		term->cursor_on = true;
+		break;
+	case 2:  /* block cursor */
+		term->big_cursor = true;
+		term->cursor_on = true;
+		break;
+	}
+}
+
+void VtCtrlCursor::SetCursorOn()
+{
+	/*
+	* set cursor start on scanline esc_args[0] and
+	* end on scanline esc_args[1].If you set
+	* the bottom scan line to a value less than
+	* the top scan line, the cursor will disappear.
+	*/
+	if (!CheckCompat(SCOANSI))
+	{
+		return;
+	}
+
+	if (m_args->Count() >= 2) 
+	{
+		term->cursor_on = m_args->GetArg(0) <= m_args->GetArg(1);
+	}
 }
 
 void VtCtrlCursor::Save()

@@ -4,7 +4,7 @@ http://ascii-table.com/ansi-escape-sequences-vt-100.php
 */
 
 #include "VtParser.h"
-#include "../define/VtType.h"
+
 
 VtParser::VtParser()
 {
@@ -42,17 +42,19 @@ void VtParser::InputChar(char ch)
 	{
 		DoPainting();
 	}
+
+	unsigned long c = ch;
 	if (m_term.termstate == TOPLEVEL)
 	{
-		m_vtTrans.Translate(ch);
+		unsigned long t = m_vtTrans.translate(ch);
 		switch (t) 
 		{
-		case UCSINCOMPLETE:
+		case UCS_INCOMPLETE:
 			return;       /* didn't complete a multibyte char */
-		case UCSTRUNCATED:
+		case UCS_TRUNCATED:
 			unget = c;
 			/* fall through */
-		case UCSINVALID:
+		case UCS_INVALID:
 			c = UCSERR;
 			break;
 		default:
@@ -60,16 +62,21 @@ void VtParser::InputChar(char ch)
 			break;
 		}
 	}
-	DoSpecialCase();
+	C1_Control(c);
 
-	if (IsC0Control(ch))
+	if (IsGL_Control(c))
 	{
-		C0Control(ch);
+		GL_Control(c);
+	}
+	else if(IsC0_Control(c))
+	{
+		m_vtC0.Parse(c);
 	}
 	else
 	{
-		NormalControl(ch);
+		NormalControl(c);
 	}
+	
 }
 
 void VtParser::DoPainting()
@@ -77,13 +84,22 @@ void VtParser::DoPainting()
 
 }
 
-void VtParser::DoSpecialCase(char& c)
+void VtParser::C1_Control(unsigned long& c)
 {
 	/*
-		 * How about C1 controls?
-		 * Explicitly ignore SCI (0x9a), which we don't translate to DECID.
-		 */
-	if ((c & -32) == 0x80 && m_term.termstate < DO_CTRLS && !m_term.vt52_mode && vt_type::IsCompat(CL_VT220))
+	* How about C1 controls?
+	* Explicitly ignore SCI (0x9a), which we don't translate to DECID.
+	*/
+	if (m_term.termstate >= DO_CTRLS)
+	{
+		return;
+	}
+	if (m_term.vt52_mode || !vt_type::IsCompat(CL_VT220))
+	{
+		return;
+	}
+
+	if ((c & -32) == 0x80)
 	{
 		if (c == 0x9a)
 		{
@@ -98,213 +114,25 @@ void VtParser::DoSpecialCase(char& c)
 	}
 }
 
-void VtParser::GLControl(char& c)
+void VtParser::GL_Control(unsigned long& c)
 {
-	//if (term->curs.x && !term->wrapnext)
-	//{
-	//	term->curs.x--;
-	//}
-	//	
-	//term->wrapnext = FALSE;
-	///* destructive backspace might be disabled */
-	//if (!term->no_dbackspace) 
-	//{
-	//	check_boundary(term, term->curs.x, term->curs.y);
-	//	check_boundary(term, term->curs.x + 1, term->curs.y);
-	//	copy_termchar(scrlineptr(term->curs.y), term->curs.x, &term->erase_char);
-	//}
-}
-
-void VtParser::C0Control(char& c)
-{
-	if ((c & ~0x1F) == 0 && term->termstate < DO_CTRLS) 
+	if (term->curs.x && !term->wrapnext)
 	{
-		switch (c) 
-		{
-		case '\005':             /* ENQ: terminal type query */
-								 /*
-								 * Strictly speaking this is VT100 but a VT100 defaults to
-								 * no response. Other terminals respond at their option.
-								 *
-								 * Don't put a CR in the default string as this tends to
-								 * upset some weird software.
-								 */
-			compatibility(ANSIMIN);
-			if (term->ldisc) {
-				strbuf *buf = term_input_data_from_charset(
-					term, DEFAULT_CODEPAGE,
-					term->answerback, term->answerbacklen);
-				ldisc_send(term->ldisc, buf->s, buf->len, false);
-				strbuf_free(buf);
-			}
-			break;
-		case '\007':            /* BEL: Bell */
-		{
-			struct beeptime *newbeep;
-			unsigned long ticks;
-
-			ticks = GETTICKCOUNT();
-
-			if (!term->beep_overloaded) 
-			{
-				newbeep = snew(struct beeptime);
-				newbeep->ticks = ticks;
-				newbeep->next = NULL;
-				if (!term->beephead)
-					term->beephead = newbeep;
-				else
-					term->beeptail->next = newbeep;
-				term->beeptail = newbeep;
-				term->nbeeps++;
-			}
-
-			/*
-			* Throw out any beeps that happened more than
-			* t seconds ago.
-			*/
-			while (term->beephead &&
-				term->beephead->ticks < ticks - term->bellovl_t) {
-				struct beeptime *tmp = term->beephead;
-				term->beephead = tmp->next;
-				sfree(tmp);
-				if (!term->beephead)
-					term->beeptail = NULL;
-				term->nbeeps--;
-			}
-
-			if (term->bellovl && term->beep_overloaded &&
-				ticks - term->lastbeep >= (unsigned)term->bellovl_s) {
-				/*
-				* If we're currently overloaded and the
-				* last beep was more than s seconds ago,
-				* leave overload mode.
-				*/
-				term->beep_overloaded = false;
-			}
-			else if (term->bellovl && !term->beep_overloaded &&
-				term->nbeeps >= term->bellovl_n) {
-				/*
-				* Now, if we have n or more beeps
-				* remaining in the queue, go into overload
-				* mode.
-				*/
-				term->beep_overloaded = true;
-			}
-			term->lastbeep = ticks;
-
-			/*
-			* Perform an actual beep if we're not overloaded.
-			*/
-			if (!term->bellovl || !term->beep_overloaded) {
-				win_bell(term->win, term->beep);
-
-				if (term->beep == BELL_VISUAL) {
-					term_schedule_vbell(term, false, 0);
-				}
-			}
-			seen_disp_event(term);
-		}
-		break;
-		case '\b':              /* BS: Back space */
-			if (term->curs.x == 0 && (term->curs.y == 0 || !term->wrap))
-				/* do nothing */;
-			else if (term->curs.x == 0 && term->curs.y > 0)
-				term->curs.x = term->cols - 1, term->curs.y--;
-			else if (term->wrapnext)
-				term->wrapnext = false;
-			else
-				term->curs.x--;
-			seen_disp_event(term);
-			break;
-		case '\016':            /* LS1: Locking-shift one */
-			compatibility(VT100);
-			term->cset = 1;
-			break;
-		case '\017':            /* LS0: Locking-shift zero */
-			compatibility(VT100);
-			term->cset = 0;
-			break;
-		case '\033':            /* ESC: Escape */
-			if (term->vt52_mode)
-				term->termstate = VT52_ESC;
-			else {
-				compatibility(ANSIMIN);
-				term->termstate = SEEN_ESC;
-				term->esc_query = 0;
-			}
-			break;
-		case '\015':            /* CR: Carriage return */
-			term->curs.x = 0;
-			term->wrapnext = false;
-			seen_disp_event(term);
-
-			if (term->crhaslf) {
-				if (term->curs.y == term->marg_b)
-					scroll(term, term->marg_t, term->marg_b, 1, true);
-				else if (term->curs.y < term->rows - 1)
-					term->curs.y++;
-			}
-			if (term->logctx)
-				logtraffic(term->logctx, (unsigned char)c, LGTYP_ASCII);
-			break;
-		case '\014':            /* FF: Form feed */
-			if (has_compat(SCOANSI)) {
-				move(term, 0, 0, 0);
-				erase_lots(term, false, false, true);
-				if (term->scroll_on_disp)
-					term->disptop = 0;
-				term->wrapnext = false;
-				seen_disp_event(term);
-				break;
-			}
-		case '\013':            /* VT: Line tabulation */
-			compatibility(VT100);
-		case '\012':            /* LF: Line feed */
-			if (term->curs.y == term->marg_b)
-				scroll(term, term->marg_t, term->marg_b, 1, true);
-			else if (term->curs.y < term->rows - 1)
-				term->curs.y++;
-			if (term->lfhascr)
-				term->curs.x = 0;
-			term->wrapnext = false;
-			seen_disp_event(term);
-			if (term->logctx)
-				logtraffic(term->logctx, (unsigned char)c, LGTYP_ASCII);
-			break;
-		case '\t':              /* HT: Character tabulation */
-		{
-			pos old_curs = term->curs;
-			termline *ldata = scrlineptr(term->curs.y);
-
-			do {
-				term->curs.x++;
-			} while (term->curs.x < term->cols - 1 &&
-				!term->tabs[term->curs.x]);
-
-			if ((ldata->lattr & LATTR_MODE) != LATTR_NORM) {
-				if (term->curs.x >= term->cols / 2)
-					term->curs.x = term->cols / 2 - 1;
-			}
-			else {
-				if (term->curs.x >= term->cols)
-					term->curs.x = term->cols - 1;
-			}
-
-			check_selection(term, old_curs, term->curs);
-		}
-		seen_disp_event(term);
-		break;
-		}
+		term->curs.x--;
+	}
+		
+	term->wrapnext = false;
+	/* destructive backspace might be disabled */
+	if (!term->no_dbackspace) 
+	{
+		check_boundary(term, term->curs.x, term->curs.y);
+		check_boundary(term, term->curs.x + 1, term->curs.y);
+		copy_termchar(scrlineptr(term->curs.y), term->curs.x, &term->erase_char);
 	}
 }
 
-void VtParser::NormalControl(char& c)
+void VtParser::NormalControl(unsigned long& c)
 {
-	if (IsC0Control(c))
-	{
-		C0Control(c);
-	}
-
 	switch (m_term.termstate)
 	{
 	case TOPLEVEL:
@@ -351,12 +179,12 @@ void VtParser::NormalControl(char& c)
 	}
 }
 
-bool VtParser::IsGLControl(char c)
+bool VtParser::IsGL_Control(unsigned long c)
 {
 	return c == '\177' && m_term.termstate < DO_CTRLS && vt_type::IsCompat(CL_OTHER);
 }
 
-bool VtParser::IsC0Control(char c)
+bool VtParser::IsC0_Control(unsigned long c)
 {
 	return (c & ~0x1F) == 0 && m_term.termstate < DO_CTRLS;
 }

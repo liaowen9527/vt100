@@ -2,7 +2,7 @@
 #include <string>
 #include "../data/terminal_tag.h"
 
-#include "VtCharTrans.h"
+#include "../translate/term_translate.h"
 #include "VtParserTopLevel.h"
 #include "VtParserESC.h"
 #include "VtParserCSI.h"
@@ -30,22 +30,21 @@ protected:
 	void InputChar(char ch);
 	
 	void DoPainting();
-	void DoSpecialCase(char& c);
-
-	void GLControl(char& c);
-
-	void NormalControl(char& c);
-	void C0Control(char& c);
+	void C1_Control(unsigned long& c);
+	void GL_Control(unsigned long& c);
+	void NormalControl(unsigned long& c);
 
 protected:
-	bool IsGLControl(char c);
-	bool IsC0Control(char c);
+	bool IsGL_Control(unsigned long c);
+	bool IsC0_Control(unsigned long c);
 
 protected:
 	VtContext m_context;
 	terminal_tag m_term;
 
-	VtCharTrans m_vtTrans;
+	term_translate m_vtTrans;
+
+	VtParserC0 m_vtC0;
 	VtParserTopLevel m_vtTopLevel;
 	VtParserESC m_vtEsc;
 	VtParserCSI m_vtCsi;

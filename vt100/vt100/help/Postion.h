@@ -47,6 +47,8 @@ public:
 public:
 	int Lines();
 
+	bool IsVaild();
+
 	bool AtUp(int row);
 	bool AtBottom(int row);
 

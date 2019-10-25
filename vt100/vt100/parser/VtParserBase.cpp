@@ -12,6 +12,15 @@ VtParserBase::~VtParserBase()
 
 }
 
+void VtParserBase::SetContext(VtContext* context)
+{
+	m_context = context;
+
+	m_term = &(m_context->term);
+
+	m_cursor = &(m_context->cursorCtrl);
+}
+
 void VtParserBase::SetTerm(VtTerm* p)
 {
 	term = p;
@@ -34,7 +43,7 @@ void VtParserBase::Parse()
 
 bool VtParserBase::CheckCompat(int vttype)
 {
-	if (!vt_type::IsCompat(OTHER))
+	if (!vt_type::IsCompat(vttype))
 	{
 		term->termstate = TOPLEVEL;
 		return false;

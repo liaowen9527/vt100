@@ -1,8 +1,8 @@
 #pragma once
-#include "../VtCtxNode.h"
+#include "VtCtrlNode.h"
 
 //Some terminals support local printing :
-class VtCtrlPrint : public VtCtxNode
+class VtCtrlPrint : public VtCtrlNode
 {
 public:
 	VtCtrlPrint();
