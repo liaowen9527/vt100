@@ -6,10 +6,10 @@ struct screen_tag
 	Margin margin;
 	bool dec_om;
 	bool insert;
-	bool wrap;
+	bool wrap;		//the line can wrapnext if wrap=true
 
 	//need save
-	bool wrapnext;
+	bool wrapnext;	//the line and the next line is the same line
 	int cset;
 	bool utf;
 	int sco_acs;

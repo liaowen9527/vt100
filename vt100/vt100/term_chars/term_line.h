@@ -9,13 +9,23 @@ public:
 	~term_line();
 
 public:
+	bool has_attr(int attr);
+	void append_attr(int attr);
+
+	term_char get_char();
+	void set_char(int col, const term_char& tc);
+
 	void check_size(int cols);
 
 protected:
 	void resize(int cols);
 
+protected:
+	//combining character to a character cell
+	void add_cc(int col, unsigned long chr);
 	void clear_cc(int col);
-	void cc_check();
+
+	//void cc_check();
 
 protected:
 	attr_line m_lattr;

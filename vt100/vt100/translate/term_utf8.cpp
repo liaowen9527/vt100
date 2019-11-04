@@ -1,5 +1,7 @@
 #include "term_utf8.h"
 
+
+
 term_utf8::term_utf8()
 	: m_state(0)
 	, m_size(0)
@@ -13,7 +15,12 @@ term_utf8::~term_utf8()
 
 }
 
-int term_utf8::append(unsigned char c)
+void term_utf8::set_translate(term_translate* trans)
+{
+	m_trans = trans;
+}
+
+unsigned long term_utf8::append(unsigned char c)
 {
 	if (m_state == 0)
 	{
@@ -23,14 +30,18 @@ int term_utf8::append(unsigned char c)
 	return append_other_char(c);
 }
 
-int term_utf8::append_first_char(unsigned char c)
+unsigned long term_utf8::append_first_char(unsigned char c)
 {
 	int len = get_len_by_first_char(c);
-	int chr = trans_first_char(c);
-
 	if (len > 6)
 	{
 		return UCS_INVALID;
+	}
+
+	int chr = trans_first_char(c);
+	if (len == 1)
+	{
+		return chr;
 	}
 
 	m_state = 1;
@@ -40,7 +51,7 @@ int term_utf8::append_first_char(unsigned char c)
 	return UCS_INCOMPLETE;
 }
 
-int term_utf8::append_other_char(unsigned char c)
+unsigned long term_utf8::append_other_char(unsigned char c)
 {
 	if (!is_other_char(c))
 	{
@@ -56,7 +67,7 @@ int term_utf8::append_other_char(unsigned char c)
 		return UCS_INCOMPLETE;
 	}
 
-	return check(m_chr);
+	return check();
 }
 
 bool term_utf8::is_finish_by_state()
@@ -99,9 +110,15 @@ int term_utf8::get_len_by_first_char(unsigned char c)
 	return -1;
 }
 
-int term_utf8::trans_first_char(int size, unsigned char c)
+unsigned long term_utf8::trans_first_char(unsigned char c)
 {
-	if (2 == size) 
+	int len = get_len_by_first_char(c);
+
+	if (1 == len)
+	{
+		return trans_first_char_ascii(c);
+	}
+	else if (2 == len) 
 	{
 		return c & 0x1f;
 	}
@@ -125,12 +142,29 @@ int term_utf8::trans_first_char(int size, unsigned char c)
 	return UCS_INVALID;
 }
 
+unsigned long term_utf8::trans_first_char_ascii(unsigned char c)
+{
+	int unitab_ctrl = get_unitab_ctrl(c);
+	/* UTF-8 must be stateless so we ignore iso2022. */
+	if (unitab_ctrl != 0xFF)
+	{
+		return unitab_ctrl;
+	}
+	else if (is_utf8linedraw())
+	{
+		/* Linedraw characters are explicitly enabled */
+		return c | CSET_LINEDRW;
+	}
+	
+	return c | CSET_ASCII;
+}
+
 int term_utf8::trans_other_char(unsigned char c)
 {
 	return c & 0x3f;
 }
 
-int term_utf8::check()
+unsigned long term_utf8::check()
 {
 	int chr = m_chr;
 	int size = m_size;
@@ -223,4 +257,14 @@ bool term_utf8::is_0xfeff(int chr)
 bool term_utf8::is_0xfffe(int chr)
 {
 	return chr == 0xFFFE || chr == 0xFFFF;
+}
+
+unsigned char term_utf8::get_unitab_ctrl(unsigned char c)
+{
+	return m_trans->get_unitab_ctrl(c);
+}
+
+bool term_utf8::is_utf8linedraw()
+{
+	return m_trans->is_utf8linedraw();
 }

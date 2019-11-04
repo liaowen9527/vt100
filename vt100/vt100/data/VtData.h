@@ -13,6 +13,6 @@ public:
 	void SetTerm(VtTerm* term);
 
 protected:
-	VtTerm* m_vtTerm;
+	VtTerm* m_term;
 };
 

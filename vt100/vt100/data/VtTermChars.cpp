@@ -11,6 +11,16 @@ VtTermChars::~VtTermChars()
 
 }
 
+void VtTermChars::Resize(int rols, int cols)
+{
+	int old_cols = m_tabs.size();
+	m_tabs.resize(cols);
+	for (int i = old_cols; i < cols; i++)
+	{
+		m_tabs[i] = (i % 8 == 0 ? true : false);
+	}
+}
+
 int VtTermChars::GetLines()
 {
 	return GetSbLines() + m_screen.get_lines();
@@ -84,6 +94,40 @@ term_lines* VtTermChars::AltScreen()
 term_lines* VtTermChars::Scrollback()
 {
 	return &m_scrollback;
+}
+
+int VtTermChars::GetCharWidth(unsigned long c)
+{
+	if (is_direct_char(c))
+	{
+		return 1;
+	}
+
+	bool cjk_ambig_wide = false;
+	return cjk_ambig_wide ? mk_wcwidth_cjk(c) : mk_wcwidth(c);
+}
+
+bool VtTermChars::FindNextTab(int from_col, int& stop_col)
+{
+	stop_col = from_col;
+	int cols = m_term->Cols();
+
+	//the last of col can not be tab
+	do
+	{
+		stop_col++;
+		if (HasTab(stop_col))
+		{
+			return true;
+		}
+	} while (stop_col < cols - 1);
+
+	return false;
+}
+
+bool VtTermChars::HasTab(int col)
+{
+	return m_tabs[col];
 }
 
 void VtTermChars::SetAltSblines(int count)

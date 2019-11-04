@@ -13,35 +13,37 @@ VtCtrlBuffer::~VtCtrlBuffer()
 
 void VtCtrlBuffer::DisplayChar()
 {
-	termline *cline = scrlineptr(term->curs.y);
-	int width = 0;
-	if (DIRECT_CHAR(c))
-		width = 1;
-	if (!width)
-		width = term_char_width(term, c);
+	VtTermChars* chars = m_term->Chars();
+	VtCursor* cursor = m_term->Cursor();
+	VtScreen* screen = m_term->Screen();
+	VtCtrlTerm* ctrlTerm = &(m_ctrl->term);
+	VtCtrlCursor* ctrlCursor = &(m_ctrl->);
 
-	if (term->wrapnext && term->wrap && width > 0) {
-		cline->lattr |= LATTR_WRAPPED;
-		if (term->curs.y == term->marg_b)
-			scroll(term, term->marg_t, term->marg_b, 1, true);
-		else if (term->curs.y < term->rows - 1)
-			term->curs.y++;
-		term->curs.x = 0;
-		term->wrapnext = false;
-		cline = scrlineptr(term->curs.y);
+	term_line* cline = chars->GetLine(cursor->Row());
+	int width = chars->GetCharWidth(c);
+
+	if (screen->IsWrapNext() && screen->CanWrap() && width > 0)
+	{
+		cline->append_attr(LATTR_WRAPPED);
+
+		m_cursor->Down();
+
+		cline = chars->GetLine(cursor->Row());
 	}
+
 	if (term->insert && width > 0)
-		insch(term, width);
-	if (term->selstate != NO_SELECTION) {
-		pos cursplus = term->curs;
-		incpos(cursplus);
-		check_selection(term, term->curs, cursplus);
+	{
+		m_ctrlTerm->insch(width);
 	}
-	if (((c & CSET_MASK) == CSET_ASCII ||
-		(c & CSET_MASK) == 0) && term->logctx)
-		logtraffic(term->logctx, (unsigned char)c, LGTYP_ASCII);
 
-	check_trust_status(term, cline);
+	if (term->selstate != NO_SELECTION)
+	{
+		Postion cursplus = screen->GetCursor();
+		ctrlTerm->incpos(cursplus);
+		ctrlTerm->check_selection(screen->GetCursor(), cursplus);
+	}
+
+	ctrlTerm->check_trust_status(term, cline);
 
 	int linecols = term->cols;
 	if (cline->trusted)

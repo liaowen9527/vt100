@@ -166,11 +166,12 @@
     <ClInclude Include="vt100\control\VtCtrlTerm.h" />
     <ClInclude Include="vt100\control\VtCtrlUnknown.h" />
     <ClInclude Include="vt100\control\VtCtrlWindow.h" />
-    <ClInclude Include="vt100\data\screen_tag.h" />
+    <ClInclude Include="vt100\data\VtCharset.h" />
     <ClInclude Include="vt100\data\VtLdisc.h" />
     <ClInclude Include="vt100\data\VtArgument.h" />
     <ClInclude Include="vt100\data\VtCursor.h" />
     <ClInclude Include="vt100\data\VtData.h" />
+    <ClInclude Include="vt100\data\VtScreen.h" />
     <ClInclude Include="vt100\data\VtTermChars.h" />
     <ClInclude Include="vt100\data\VtTerm.h" />
     <ClInclude Include="vt100\define\Termstate.h" />
@@ -197,15 +198,19 @@
     <ClInclude Include="vt100\parser\VtParserVT52_Y1.h" />
     <ClInclude Include="vt100\parser\VtParserVT52_Y2.h" />
     <ClInclude Include="vt100\struct\graphics.h" />
-    <ClInclude Include="vt100\struct\unicode_data.h" />
     <ClInclude Include="vt100\term_chars\attr_char.h" />
     <ClInclude Include="vt100\term_chars\attr_line.h" />
     <ClInclude Include="vt100\term_chars\term_char.h" />
     <ClInclude Include="vt100\term_chars\term_line.h" />
     <ClInclude Include="vt100\term_chars\term_lines.h" />
     <ClInclude Include="vt100\term_chars\truecolour.h" />
+    <ClInclude Include="vt100\term_chars\wchar_width.h" />
+    <ClInclude Include="vt100\translate\cp_list.h" />
     <ClInclude Include="vt100\translate\term_translate.h" />
     <ClInclude Include="vt100\translate\term_utf8.h" />
+    <ClInclude Include="vt100\translate\unicode_data.h" />
+    <ClInclude Include="vt100\translate\unicode_table.h" />
+    <ClInclude Include="vt100\translate\unicode_tbl.h" />
     <ClInclude Include="vt100\VtContext.h" />
   </ItemGroup>
   <ItemGroup>
@@ -228,10 +233,12 @@
     <ClCompile Include="vt100\control\VtCtrlTerm.cpp" />
     <ClCompile Include="vt100\control\VtCtrlUnknown.cpp" />
     <ClCompile Include="vt100\control\VtCtrlWindow.cpp" />
+    <ClCompile Include="vt100\data\VtCharset.cpp" />
     <ClCompile Include="vt100\data\VtLdisc.cpp" />
     <ClCompile Include="vt100\data\VtArgument.cpp" />
     <ClCompile Include="vt100\data\VtCursor.cpp" />
     <ClCompile Include="vt100\data\VtData.cpp" />
+    <ClCompile Include="vt100\data\VtScreen.cpp" />
     <ClCompile Include="vt100\data\VtTermChars.cpp" />
     <ClCompile Include="vt100\data\VtTerm.cpp" />
     <ClCompile Include="vt100\help\Codepage.cpp" />
@@ -255,15 +262,20 @@
     <ClCompile Include="vt100\parser\VtParserVT52_Y1.cpp" />
     <ClCompile Include="vt100\parser\VtParserVT52_Y2.cpp" />
     <ClCompile Include="vt100\struct\graphics.cpp" />
-    <ClCompile Include="vt100\struct\unicode_data.cpp" />
     <ClCompile Include="vt100\term_chars\attr_char.cpp" />
     <ClCompile Include="vt100\term_chars\attr_line.cpp" />
     <ClCompile Include="vt100\term_chars\term_char.cpp" />
     <ClCompile Include="vt100\term_chars\term_line.cpp" />
     <ClCompile Include="vt100\term_chars\term_lines.cpp" />
     <ClCompile Include="vt100\term_chars\truecolour.cpp" />
+    <ClCompile Include="vt100\term_chars\wchar_width.cpp" />
+    <ClCompile Include="vt100\translate\cp_list.cpp" />
+    <ClCompile Include="vt100\translate\cp_list_const.cpp" />
     <ClCompile Include="vt100\translate\term_translate.cpp" />
     <ClCompile Include="vt100\translate\term_utf8.cpp" />
+    <ClCompile Include="vt100\translate\unicode_data.cpp" />
+    <ClCompile Include="vt100\translate\unicode_table.cpp" />
+    <ClCompile Include="vt100\translate\unicode_tbl.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

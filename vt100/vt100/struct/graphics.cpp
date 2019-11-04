@@ -1,4 +1,4 @@
-#include "Postion.h"
+#include "graphics.h"
 
 Postion::Postion(int _row /*= 0*/, int _col /*= 0*/)
 	: row(_row)

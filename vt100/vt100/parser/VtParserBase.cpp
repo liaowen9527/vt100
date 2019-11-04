@@ -28,12 +28,14 @@ void VtParserBase::SetTerm(VtTerm* p)
 
 unsigned long VtParserBase::GetChar()
 {
-	return c;
+	return m_char;
 }
 
-void VtParserBase::Parse(char ch)
+void VtParserBase::Parse(unsigned long c)
 {
-	c = ch;
+	m_char = c;
+
+	Parse();
 }
 
 void VtParserBase::Parse()
@@ -66,14 +68,4 @@ int VtParserBase::GetCharWidth(char c)
 	}
 
 	return width;
-}
-
-bool VtParserBase::IsChar(char c)
-{
-	return (c & 0xFFFFFC00) == 0xD800;
-}
-
-bool VtParserBase::IsFont(char c)
-{
-	return (c & 0xFFFFFE00) == 0xF000;
 }

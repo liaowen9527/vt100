@@ -25,12 +25,12 @@ void attr_line::enable(int attr, bool _enable)
 
 bool attr_line::is_enable(int attr)
 {
-	return m_attr & attr;
+	return m_attr & attr != LATTR_NORM;
 }
 
 bool attr_line::is_normal()
 {
-	return is_enable(LATTR_NORM);
+	return m_attr == LATTR_NORM;
 }
 
 bool attr_line::is_wide()

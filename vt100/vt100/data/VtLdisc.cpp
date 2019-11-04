@@ -226,6 +226,11 @@ void VtLdisc::Send(const char* buf, int len, bool interactive)
 	}
 }
 
+void VtLdisc::Send(const std::string& str, bool interactive)
+{
+
+}
+
 void VtLdisc::UpdateEchoEdit()
 {
 

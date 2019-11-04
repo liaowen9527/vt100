@@ -165,9 +165,6 @@
     <ClInclude Include="vt100\control\VtCtrlWindow.h">
       <Filter>vt100\control</Filter>
     </ClInclude>
-    <ClInclude Include="vt100\struct\unicode_data.h">
-      <Filter>vt100\struct</Filter>
-    </ClInclude>
     <ClInclude Include="vt100\translate\term_translate.h">
       <Filter>vt100\translate</Filter>
     </ClInclude>
@@ -198,8 +195,29 @@
     <ClInclude Include="vt100\data\VtTermChars.h">
       <Filter>vt100\data</Filter>
     </ClInclude>
-    <ClInclude Include="vt100\data\screen_tag.h">
+    <ClInclude Include="vt100\term_chars\term_lines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\translate\cp_list.h">
+      <Filter>vt100\translate</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\translate\unicode_data.h">
+      <Filter>vt100\translate</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\translate\unicode_table.h">
+      <Filter>vt100\translate</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\translate\unicode_tbl.h">
+      <Filter>vt100\translate</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtCharset.h">
       <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\data\VtScreen.h">
+      <Filter>vt100\data</Filter>
+    </ClInclude>
+    <ClInclude Include="vt100\term_chars\wchar_width.h">
+      <Filter>vt100\term_chars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -317,9 +335,6 @@
     <ClCompile Include="vt100\control\VtCtrlWindow.cpp">
       <Filter>vt100\control</Filter>
     </ClCompile>
-    <ClCompile Include="vt100\struct\unicode_data.cpp">
-      <Filter>vt100\struct</Filter>
-    </ClCompile>
     <ClCompile Include="vt100\translate\term_translate.cpp">
       <Filter>vt100\translate</Filter>
     </ClCompile>
@@ -349,6 +364,33 @@
     </ClCompile>
     <ClCompile Include="vt100\data\VtTermChars.cpp">
       <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\term_chars\term_lines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\translate\cp_list.cpp">
+      <Filter>vt100\translate</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\translate\cp_list_const.cpp">
+      <Filter>vt100\translate</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\translate\unicode_data.cpp">
+      <Filter>vt100\translate</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\translate\unicode_table.cpp">
+      <Filter>vt100\translate</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\translate\unicode_tbl.cpp">
+      <Filter>vt100\translate</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtCharset.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\data\VtScreen.cpp">
+      <Filter>vt100\data</Filter>
+    </ClCompile>
+    <ClCompile Include="vt100\term_chars\wchar_width.cpp">
+      <Filter>vt100\term_chars</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

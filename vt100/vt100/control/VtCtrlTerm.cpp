@@ -358,70 +358,7 @@ void VtCtrlTerm::SwapScreen(int which, bool reset, bool keep_cur_pos)
 
 void VtCtrlTerm::Bell()
 {
-	struct beeptime *newbeep;
-	unsigned long ticks;
-
-	ticks = GETTICKCOUNT();
-
-	if (!term->beep_overloaded)
-	{
-		newbeep = snew(struct beeptime);
-		newbeep->ticks = ticks;
-		newbeep->next = NULL;
-		if (!term->beephead)
-			term->beephead = newbeep;
-		else
-			term->beeptail->next = newbeep;
-		term->beeptail = newbeep;
-		term->nbeeps++;
-	}
-
-	/*
-	* Throw out any beeps that happened more than
-	* t seconds ago.
-	*/
-	while (term->beephead &&
-		term->beephead->ticks < ticks - term->bellovl_t) {
-		struct beeptime *tmp = term->beephead;
-		term->beephead = tmp->next;
-		sfree(tmp);
-		if (!term->beephead)
-			term->beeptail = NULL;
-		term->nbeeps--;
-	}
-
-	if (term->bellovl && term->beep_overloaded &&
-		ticks - term->lastbeep >= (unsigned)term->bellovl_s) {
-		/*
-		* If we're currently overloaded and the
-		* last beep was more than s seconds ago,
-		* leave overload mode.
-		*/
-		term->beep_overloaded = false;
-	}
-	else if (term->bellovl && !term->beep_overloaded &&
-		term->nbeeps >= term->bellovl_n) {
-		/*
-		* Now, if we have n or more beeps
-		* remaining in the queue, go into overload
-		* mode.
-		*/
-		term->beep_overloaded = true;
-	}
-	term->lastbeep = ticks;
-
-	/*
-	* Perform an actual beep if we're not overloaded.
-	*/
-	if (!term->bellovl || !term->beep_overloaded) 
-	{
-		win_bell(term->win, term->beep);
-
-		if (term->beep == BELL_VISUAL) {
-			term_schedule_vbell(term, false, 0);
-		}
-	}
-	seen_disp_event(term);
+	
 }
 
 void VtCtrlTerm::MediaCopy()
@@ -458,14 +395,14 @@ void VtCtrlTerm::LockShift(int index)
 		return;
 	}
 	
-	term->cset = index;
+	m_term->Screen()->SetCharset(index);
 }
 
 void VtCtrlTerm::EnterEsc()
 {
-	if (term->vt52_mode)
+	if (m_term->IsVt52Mode())
 	{
-		term->termstate = VT52_ESC;
+		m_term->SetTermState(VT52_ESC);
 	}
 	else 
 	{
@@ -474,95 +411,99 @@ void VtCtrlTerm::EnterEsc()
 			return;
 		}
 
-		term->termstate = SEEN_ESC;
-		term->esc_query = 0;
+		m_term->SetTermState(SEEN_ESC);
+		m_term->SetEscQuery(0);
 	}
 }
 
 void VtCtrlTerm::KeyCR()
 {
-	term->curs.x = 0;
-	term->wrapnext = false;
-	seen_disp_event(term);
+	VtScreen* screen = m_term->Screen();
+	VtCursor* cursor = m_term->Cursor();
+	cursor->SetCol(0);
+	screen->SetWrapNext(false);
 
-	if (term->crhaslf) 
+	if (m_term->CrHasLf()) 
 	{
-		if (term->curs.y == term->marg_b)
+		if (cursor->AtBottom())
 		{
-			scroll(term, term->marg_t, term->marg_b, 1, true);
+			Margin marg = screen->GetMargin();
+			scroll(marg.top, marg.bottom, 1, true);
 		}
-		else if (term->curs.y < term->rows - 1)
+		else if (cursor->Row() < m_term->Rows() - 1)
 		{
-			term->curs.y++;
+			cursor->SetRow(cursor->Row() + 1);
 		}
 	}
 
-	if (term->logctx)
-		logtraffic(term->logctx, (unsigned char)c, LGTYP_ASCII);
+	seen_disp_event();
 }
 
 void VtCtrlTerm::KeyLF()
 {
-	if (term->curs.y == term->marg_b)
+	VtScreen* screen = m_term->Screen();
+	VtCursor* cursor = m_term->Cursor();
+
+	if (cursor->AtBottom())
 	{
-		scroll(term, term->marg_t, term->marg_b, 1, true);
+		Margin marg = screen->GetMargin();
+		scroll(marg.top, marg.bottom, 1, true);
 	}
-	else if (term->curs.y < term->rows - 1)
+	else if (cursor->Row() < m_term->Rows() - 1)
 	{
-		term->curs.y++;
+		cursor->SetRow(cursor->Row() + 1);
 	}
 		
-	if (term->lfhascr)
+	if (m_term->CrHasLf())
 	{
-		term->curs.x = 0;
+		cursor->SetCol(0);
 	}
 
-	term->wrapnext = false;
-	seen_disp_event(term);
+	screen->SetWrapNext(false);
 
-	if (term->logctx)
-		logtraffic(term->logctx, (unsigned char)c, LGTYP_ASCII);
+	seen_disp_event();
 }
 
 void VtCtrlTerm::KeyTab()
 {
-	pos old_curs = term->curs;
-	termline *ldata = scrlineptr(term->curs.y);
+	VtTermChars* chars = m_term->Chars();
+	VtScreen* screen = m_term->Screen();
+	Postion old_curs = screen->GetCursor();
+	Postion curs = screen->GetCursor();
+	int cols = m_term->Cols();
+	
+	term_line* ldata = chars->GetLine(curs.row);
 
-	do 
-	{
-		term->curs.x++;
-	} while (term->curs.x < term->cols - 1 && !term->tabs[term->curs.x]);
+	chars->FindNextTab(old_curs.col, curs.col);
 
-	if ((ldata->lattr & LATTR_MODE) != LATTR_NORM) 
+	if (ldata->has_attr(LATTR_MODE))
 	{
-		if (term->curs.x >= term->cols / 2)
-		{
-			term->curs.x = term->cols / 2 - 1;
-		}
+		curs.col = std::min<int>(curs.col, cols / 2 - 1);
 	}
 	else 
 	{
-		if (term->curs.x >= term->cols)
-		{
-			term->curs.x = term->cols - 1;
-		}
+		curs.col = std::min<int>(curs.col, cols - 1);
 	}
 
-	check_selection(term, old_curs, term->curs);
-	seen_disp_event(term);
+	screen->SetCursor(curs);
+	check_selection(old_curs, screen->GetCursor());
+
+	seen_disp_event();
 }
 
 void VtCtrlTerm::FormFeed()
 {
+	VtScreen* screen = m_term->Screen();
 	if (HasCompat(SCOANSI))
 	{
-		move(term, 0, 0, 0);
-		erase_lots(term, false, false, true);
-		if (term->scroll_on_disp)
-			term->disptop = 0;
-		term->wrapnext = false;
-		seen_disp_event(term);
+		move(0, 0, 0);
+		erase_lots(false, false, true);
+		if (m_term->IsScrollOnDisp())
+		{
+			m_term->SetDispTop(0);
+		}
+			
+		screen->SetWrapNext(false);
 		return;
 	}
 
@@ -577,5 +518,55 @@ void VtCtrlTerm::LineTab()
 	}
 
 	KeyLF();
+}
+
+void VtCtrlTerm::move(int row, int col, int marg_clip)
+{
+
+}
+
+void VtCtrlTerm::scroll(int topline, int botline, int lines, bool sb)
+{
+
+}
+
+void VtCtrlTerm::erase_lots(bool line_only, bool from_begin, bool to_end)
+{
+
+}
+
+void VtCtrlTerm::check_selection(Postion from, Postion to)
+{
+
+}
+
+void VtCtrlTerm::check_boundary(int row, int col)
+{
+
+}
+
+void VtCtrlTerm::check_trust_status(term_line *line)
+{
+
+}
+
+void VtCtrlTerm::clear_cc(term_line *line, int col)
+{
+
+}
+
+void VtCtrlTerm::insch(int width)
+{
+
+}
+
+void VtCtrlTerm::incpos(Postion& pos)
+{
+
+}
+
+void VtCtrlTerm::seen_disp_event()
+{
+
 }
 

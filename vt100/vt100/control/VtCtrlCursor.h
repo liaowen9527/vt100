@@ -31,4 +31,7 @@ public:
 
 	void Save();
 	void Restore();
+
+protected:
+	void DoSetPositon(int row, int col);
 };

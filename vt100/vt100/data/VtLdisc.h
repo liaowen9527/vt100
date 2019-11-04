@@ -41,6 +41,7 @@ public:
 	~VtLdisc();
 
 public:
+	void Send(const std::string& str, bool interactive);
 	void Send(const char* buf, int len, bool interactive);
 
 	void UpdateEchoEdit();

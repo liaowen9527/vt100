@@ -16,6 +16,16 @@ public:
 	~term_char();
 
 public:
+	unsigned long get_chr();
+	void set_chr(unsigned long chr);
+
+	attr_char get_attr();
+	void set_attr(const attr_char& attr);
+
+	truecolour get_truecolour();
+	void set_truecolour(const truecolour& clour);
+
+public:
 	int cc_next();
 
 public:

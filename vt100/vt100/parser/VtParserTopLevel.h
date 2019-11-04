@@ -9,5 +9,12 @@ public:
 
 public:
 	virtual void Parse();
+
+protected:
+	void Display_W0();
+	void Display_W1();
+	void Display_W2();
+
+	void After_Display();
 };
 

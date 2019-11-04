@@ -1,18 +1,8 @@
 #pragma once
-#include "VtData.h"
 
-struct cursor_tag
-{
-	int row;
-	int col;
-	int attr;
-	int cset;
-	int wrapnext;
-	int cset_attr;
-	int sco_acs;
-};
+class VtScreen;
 
-class VtCursor : public VtData
+class VtCursor
 {
 public:
 	VtCursor();
@@ -40,6 +30,7 @@ public:
 
 public:
 	bool IsVisible();
+	bool AtBottom();
 
 public:
 	int ToInsideRow(int row);
@@ -49,7 +40,6 @@ public:
 	int ToVisibleRow(int row);
 	
 protected:
-	cursor_tag m_tag;
-	cursor_tag m_save_tag;
+	VtScreen* m_screen;
 };
 

@@ -30,13 +30,17 @@ void VtCtrlLdisc::QueryType2()
 	* Don't put a CR in the default string as this tends to
 	* upset some weird software.
 	*/
-	compatibility(ANSIMIN);
-	if (term->ldisc) {
-		strbuf *buf = term_input_data_from_charset(
-			term, DEFAULT_CODEPAGE,
-			term->answerback, term->answerbacklen);
-		ldisc_send(term->ldisc, buf->s, buf->len, false);
-		strbuf_free(buf);
+	if (!CheckCompat(ANSIMIN))
+	{
+		return;
+	}
+	
+	VtLdisc* ldisc = m_term->Ldisc();
+	if (ldisc) 
+	{
+		std::string buf;
+		//strbuf *buf = term_input_data_from_charset(term, DEFAULT_CODEPAGE, term->answerback, term->answerbacklen);
+		ldisc->Send(buf, false);
 	}
 }
 

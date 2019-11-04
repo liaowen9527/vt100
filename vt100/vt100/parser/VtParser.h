@@ -29,7 +29,6 @@ public:
 protected:
 	void InputChar(char ch);
 	
-	void DoPainting();
 	void C1_Control(unsigned long& c);
 	void GL_Control(unsigned long& c);
 	void NormalControl(unsigned long& c);
@@ -40,17 +39,17 @@ protected:
 
 protected:
 	VtContext m_context;
-	terminal_tag m_term;
-
+	VtTerm* m_term;
 	term_translate m_vtTrans;
 
+protected:
 	VtParserC0 m_vtC0;
 	VtParserTopLevel m_vtTopLevel;
 	VtParserESC m_vtEsc;
 	VtParserCSI m_vtCsi;
 	VtParserOSC m_vtOsc;
 	VtParserOSC_W m_vtOscW;
-	VtCharTrans m_vtOscP;
+	VtParserOSC_P m_vtOscP;
 	VtParserOSC_String m_vtOscStr;
 	VtParserOSC_MaybeST m_vtMaybeST;
 	VtParserVT52Esc m_vt52Esc;

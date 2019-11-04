@@ -1,8 +1,3 @@
-/*
-https://www2.ccs.neu.edu/research/gpc/VonaUtils/vona/terminal/vtansi.htm
-http://ascii-table.com/ansi-escape-sequences-vt-100.php
-*/
-
 #include "VtParserC0.h"
 
 VtParserC0::VtParserC0()
@@ -17,7 +12,7 @@ VtParserC0::~VtParserC0()
 
 void VtParserC0::Parse()
 {
-	if ((c & ~0x1F) != 0 || term->termstate >= DO_CTRLS)
+	if ((c & ~0x1F) != 0 || m_term->GetTermState() >= DO_CTRLS)
 	{
 		return;
 	}

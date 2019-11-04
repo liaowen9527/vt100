@@ -10,6 +10,36 @@ term_char::~term_char()
 
 }
 
+unsigned long term_char::get_chr()
+{
+	return m_tchar;
+}
+
+void term_char::set_chr(unsigned long chr)
+{
+	m_tchar = chr;
+}
+
+attr_char term_char::get_attr()
+{
+	return m_attr;
+}
+
+void term_char::set_attr(const attr_char& attr)
+{
+	m_attr = attr;
+}
+
+truecolour term_char::get_truecolour()
+{
+	return m_colour;
+}
+
+void term_char::set_truecolour(const truecolour& clour)
+{
+	m_colour = clour;
+}
+
 int term_char::cc_next()
 {
 	return m_cc_next;

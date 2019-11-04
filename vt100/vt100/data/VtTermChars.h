@@ -10,6 +10,9 @@ public:
 	~VtTermChars();
 
 public:
+	void Resize(int rols, int cols);
+
+public:
 	int GetLines();
 	int GetSbLines();
 
@@ -19,6 +22,12 @@ public:
 	term_lines* Screen();
 	term_lines* AltScreen();
 	term_lines* Scrollback();
+
+	int GetCharWidth(unsigned long c);
+
+public:
+	bool FindNextTab(int from_col, int& stop_col);
+	bool HasTab(int col);
 
 public:
 	void SetAltSblines(int count);
@@ -34,4 +43,6 @@ protected:
 	term_lines m_scrollback;
 
 	int m_alt_sblines;
+
+	std::vector<bool> m_tabs;
 };

@@ -55,4 +55,5 @@ struct VtControl
 	VtCtrlUnknown unknown;
 	VtCtrlBuffer buffer;
 	VtCtrlWindow win;
+	VtCtrlTerm term;
 };

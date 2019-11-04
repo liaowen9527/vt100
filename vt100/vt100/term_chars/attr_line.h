@@ -4,7 +4,7 @@
 #define LATTR_WIDE   0x00000001UL
 #define LATTR_TOP    0x00000002UL
 #define LATTR_BOT    0x00000003UL
-#define LATTR_MODE   0x00000003UL
+#define LATTR_MODE   0x00000003UL		//top and wide
 #define LATTR_WRAPPED 0x00000010UL     /* this line wraps to next */
 #define LATTR_WRAPPED2 0x00000020UL    /* with WRAPPED: CJK wide character
 										  wrapped to next line, so last

@@ -10,10 +10,34 @@ public:
 	~VtTerm();
 
 public:
+	VtScreen* Screen();
 	VtCursor* Cursor();
 	VtArgument* Argument();
 	VtLdisc* Ldisc();
 	VtTermChars* Chars();
+	VtCharset* Charset();
+
+public:
+	Termstate GetTermState();
+	void SetTermState(Termstate state);
+
+	bool IsVt52Mode();
+	void SetVt52Mode(bool val);
+
+	int GetEscQuery();
+	void SetEscQuery(int val);
+
+	int GetDispTop();
+	void SetDispTop(int val);
+
+	SelState GetSelState();
+
+public:
+	bool CrHasLf();
+	void SetCrHasLf(bool val);
+
+	bool IsScrollOnDisp();
+	void SetScrollOnDisp(bool val);
 
 public:
 	int Rows();
@@ -48,8 +72,8 @@ protected:
 	VtLdisc m_ldisc;
 
 	//screen and alternate screen
-	screen_tag m_screen;
-	screen_tag m_alt_screen;
+	VtScreen m_screen;
+	VtScreen m_alt_screen;
 
 	VtTermChars m_chars;
 
@@ -69,8 +93,19 @@ protected:
 	//scroll back chars and arguments
 	VtTermChars m_scrollback;
 	VtArgument m_args;
+	VtCharset m_charset;
 
-	Termstate termstate;
-	
+protected:	//temporary variable
+	Termstate m_termstate;
+	int m_unget;
+	bool m_vt52_mode;
+	int m_esc_query;
+	int m_disptop;	/* distance scrolled back (0 or -ve) */
+
+	term_char m_cur_chr;
+
+protected: //setting
+	bool m_crhaslf;
+	bool m_scroll_on_disp;
 };
 

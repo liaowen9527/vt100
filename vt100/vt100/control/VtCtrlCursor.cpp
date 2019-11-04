@@ -45,15 +45,30 @@ void VtCtrlCursor::Backward()
 
 void VtCtrlCursor::Backspace()
 {
-	if (term->curs.x == 0 && (term->curs.y == 0 || !term->wrap))
-		/* do nothing */;
-	else if (term->curs.x == 0 && term->curs.y > 0)
-		term->curs.x = term->cols - 1, term->curs.y--;
-	else if (term->wrapnext)
-		term->wrapnext = false;
+	VtScreen* screen = m_term->Screen();
+	Postion curs = screen->GetCursor();
+	int row = curs.row;
+	int col = curs.col;
+
+	if (col == 0 && (row == 0 || !screen->CanWrap()))
+	{
+		return;
+	}
+	else if (row > 0 && col == 0)
+	{
+		row--;
+		col = m_term->Cols();
+	}
+	else if (screen->IsWrapNext())
+	{
+		screen->SetWrapNext(false);
+	}
 	else
-		term->curs.x--;
-	seen_disp_event(term);
+	{
+		col--;
+	}
+
+	DoSetPositon(row.col);
 }
 
 void VtCtrlCursor::DownAndCR()
@@ -199,4 +214,12 @@ void VtCtrlCursor::Restore()
 {
 	VtCursor& cursor = m_context->terminal.Cursor();
 	cursor.Restore();
+}
+
+void VtCtrlCursor::DoSetPositon(int row, int col)
+{
+	VtScreen* screen = m_term->Screen();
+	screen->SetCursor(row, col);
+
+	seen_disp_event(term);
 }

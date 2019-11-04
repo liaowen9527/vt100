@@ -10,6 +10,11 @@ VtTerm::~VtTerm()
 
 }
 
+VtScreen* VtTerm::Screen()
+{
+	return &m_screen;
+}
+
 VtCursor* VtTerm::Cursor()
 {
 	return nullptr;
@@ -28,6 +33,76 @@ VtLdisc* VtTerm::Ldisc()
 VtTermChars* VtTerm::Chars()
 {
 	return &m_chars;
+}
+
+VtCharset* VtTerm::Charset()
+{
+	return &m_charset;
+}
+
+Termstate VtTerm::GetTermState()
+{
+	return m_termstate;
+}
+
+void VtTerm::SetTermState(Termstate state)
+{
+	m_termstate = state;
+}
+
+bool VtTerm::IsVt52Mode()
+{
+	return m_vt52_mode;
+}
+
+void VtTerm::SetVt52Mode(bool val)
+{
+	m_vt52_mode = val;
+}
+
+int VtTerm::GetEscQuery()
+{
+	return m_esc_query;
+}
+
+void VtTerm::SetEscQuery(int val)
+{
+	m_esc_query = val;
+}
+
+int VtTerm::GetDispTop()
+{
+	return m_disptop;
+}
+
+void VtTerm::SetDispTop(int val)
+{
+	m_disptop = val;
+}
+
+SelState VtTerm::GetSelState()
+{
+	return m_selstate;
+}
+
+bool VtTerm::CrHasLf()
+{
+	return m_crhaslf;
+}
+
+void VtTerm::SetCrHasLf(bool val)
+{
+	m_crhaslf = val;
+}
+
+bool VtTerm::IsScrollOnDisp()
+{
+	return m_scroll_on_disp;
+}
+
+void VtTerm::SetScrollOnDisp(bool val)
+{
+	m_scroll_on_disp = val;
 }
 
 int VtTerm::Rows()

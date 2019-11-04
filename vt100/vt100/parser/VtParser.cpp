@@ -1,10 +1,5 @@
-/*
-https://www2.ccs.neu.edu/research/gpc/VonaUtils/vona/terminal/vtansi.htm
-http://ascii-table.com/ansi-escape-sequences-vt-100.php
-*/
-
 #include "VtParser.h"
-
+#include "../data/VtTerm.h"
 
 VtParser::VtParser()
 {
@@ -38,21 +33,17 @@ void VtParser::Parse(const char* str, int len)
 
 void VtParser::InputChar(char ch)
 {
-	if (m_bPrinting)
-	{
-		DoPainting();
-	}
-
 	unsigned long c = ch;
-	if (m_term.termstate == TOPLEVEL)
+
+	if (m_term->GetTermState() == TOPLEVEL)
 	{
 		unsigned long t = m_vtTrans.translate(ch);
-		switch (t) 
+		switch (t)
 		{
 		case UCS_INCOMPLETE:
 			return;       /* didn't complete a multibyte char */
 		case UCS_TRUNCATED:
-			unget = c;
+			m_unget = c;
 			/* fall through */
 		case UCS_INVALID:
 			c = UCSERR;
@@ -62,6 +53,7 @@ void VtParser::InputChar(char ch)
 			break;
 		}
 	}
+
 	C1_Control(c);
 
 	if (IsGL_Control(c))
@@ -79,22 +71,17 @@ void VtParser::InputChar(char ch)
 	
 }
 
-void VtParser::DoPainting()
-{
-
-}
-
 void VtParser::C1_Control(unsigned long& c)
 {
 	/*
 	* How about C1 controls?
 	* Explicitly ignore SCI (0x9a), which we don't translate to DECID.
 	*/
-	if (m_term.termstate >= DO_CTRLS)
+	if (m_term->GetTermState() >= DO_CTRLS)
 	{
 		return;
 	}
-	if (m_term.vt52_mode || !vt_type::IsCompat(CL_VT220))
+	if (m_term->IsVt52Mode() || !vt_type::IsCompat(CL_VT220))
 	{
 		return;
 	}
@@ -107,8 +94,8 @@ void VtParser::C1_Control(unsigned long& c)
 		}	
 		else 
 		{
-			m_term.termstate = SEEN_ESC;
-			m_term.esc_query = FALSE;
+			m_term->SetTermState(SEEN_ESC);
+			m_term->SetEscQuery(0);
 			c = '@' + (c & 0x1F);
 		}
 	}
@@ -116,24 +103,24 @@ void VtParser::C1_Control(unsigned long& c)
 
 void VtParser::GL_Control(unsigned long& c)
 {
-	if (term->curs.x && !term->wrapnext)
-	{
-		term->curs.x--;
-	}
-		
-	term->wrapnext = false;
-	/* destructive backspace might be disabled */
-	if (!term->no_dbackspace) 
-	{
-		check_boundary(term, term->curs.x, term->curs.y);
-		check_boundary(term, term->curs.x + 1, term->curs.y);
-		copy_termchar(scrlineptr(term->curs.y), term->curs.x, &term->erase_char);
-	}
+	//if (term->curs.x && !term->wrapnext)
+	//{
+	//	term->curs.x--;
+	//}
+	//	
+	//term->wrapnext = false;
+	///* destructive backspace might be disabled */
+	//if (!term->no_dbackspace) 
+	//{
+	//	check_boundary(term, term->curs.x, term->curs.y);
+	//	check_boundary(term, term->curs.x + 1, term->curs.y);
+	//	copy_termchar(scrlineptr(term->curs.y), term->curs.x, &term->erase_char);
+	//}
 }
 
 void VtParser::NormalControl(unsigned long& c)
 {
-	switch (m_term.termstate)
+	switch (m_term->GetTermState())
 	{
 	case TOPLEVEL:
 		m_vtTopLevel.Parse(c);
@@ -181,10 +168,10 @@ void VtParser::NormalControl(unsigned long& c)
 
 bool VtParser::IsGL_Control(unsigned long c)
 {
-	return c == '\177' && m_term.termstate < DO_CTRLS && vt_type::IsCompat(CL_OTHER);
+	return c == '\177' && m_term->GetTermState() < DO_CTRLS && vt_type::IsCompat(CL_OTHER);
 }
 
 bool VtParser::IsC0_Control(unsigned long c)
 {
-	return (c & ~0x1F) == 0 && m_term.termstate < DO_CTRLS;
+	return (c & ~0x1F) == 0 && m_term->GetTermState() < DO_CTRLS;
 }

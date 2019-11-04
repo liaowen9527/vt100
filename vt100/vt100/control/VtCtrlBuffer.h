@@ -19,4 +19,5 @@ public:
 	void ClearTabs();
 
 	void WriteSpaces();
+
 };

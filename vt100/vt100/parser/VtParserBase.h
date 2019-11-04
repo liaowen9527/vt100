@@ -26,25 +26,25 @@ public:
 public:
 	void SetContext(VtContext* context);
 	void SetTerm(VtTerm* p);
+
 	unsigned long GetChar();
 
-	void Parse(char ch);
+	void Parse(unsigned long c);
+
+protected:
 	virtual void Parse();
 
 protected:
 	bool CheckCompat(int vttype);
 
-protected:
 	int GetCharWidth(char c);
-	bool IsChar(char c);
-	bool IsFont(char c);
 
 protected:
-	unsigned long c;
+	unsigned long m_char;
 	VtContext* m_context;
 	VtTerm* m_term;
-	VtTerm* term;
 
+protected:
 	VtCtrlTerm* m_ctrlTerm;
 	VtCtrlCharset* m_charset;
 	VtCtrlErase* m_erase;

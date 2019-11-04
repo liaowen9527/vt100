@@ -13,34 +13,32 @@ VtCursor::~VtCursor()
 
 void VtCursor::Get(int& row, int& col)
 {
-	row = m_tag.row;
-	col = m_tag.col;
+	m_screen->GetCursor(row, col);
 }
 
 void VtCursor::Set(int row, int col)
 {
-	m_tag.row = row;
-	m_tag.col = col;
+	m_screen->SetCursor(row, col);
 }
 
 int VtCursor::Row()
 {
-	return m_tag.row;
+	return m_screen->m_curs.row;
 }
 
 void VtCursor::SetRow(int row)
 {
-	m_tag.row = row;
+	m_screen->m_curs.row = row;
 }
 
 int VtCursor::Col()
 {
-	return m_tag.col;
+	return m_screen->m_curs.col;
 }
 
 void VtCursor::SetCol(int col)
 {
-	m_tag.col = col;
+	m_screen->m_curs.col = col;
 }
 
 void VtCursor::Move(int row, int col)
@@ -128,6 +126,12 @@ void VtCursor::Restore()
 bool VtCursor::IsVisible()
 {
 	return term->IsVisibleRow(Row());
+}
+
+bool VtCursor::AtBottom()
+{
+	Margin marg = m_screen->GetMargin();
+	return Row() == marg.bottom;
 }
 
 int VtCursor::ToInsideRow(int row)
